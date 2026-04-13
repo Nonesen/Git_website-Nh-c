@@ -1112,8 +1112,8 @@ h1, h2, h3, .logo span {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Home Section Layout */
@@ -1150,7 +1150,6 @@ h1, h2, h3, .logo span {
 .header-settings:hover {
     color: white;
     background: rgba(255, 255, 255, 0.1);
-    transform: rotate(30deg);
 }
 
 .settings-dropdown {
@@ -1166,7 +1165,7 @@ h1, h2, h3, .logo span {
     display: none;
     z-index: 1002;
     cursor: default;
-    animation: fadeIn 0.3s var(--transition);
+    animation: fadeIn 0.3s ease;
 }
 
 .settings-dropdown.active {
