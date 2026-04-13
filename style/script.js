@@ -572,18 +572,11 @@ function loginUser(user) {
     userAvatar.src = `https://ui-avatars.com/api/?name=${user.name}&background=${user.role === 'admin' ? 'f59e0b' : '6366f1'}&color=fff`;
     
     if (user.role === 'admin') {
-        adminPanel.style.display = 'block';
-        heroSection.style.display = 'none';
-        songListSection.style.display = 'none';
-        switchAdminBtn.innerHTML = '<i class="fa-solid fa-user"></i> <span data-i18n="nav-user">Chuyển sang User</span>';
         updateSidebarForRole('admin');
         showAdminSection('music'); // Default admin view
     } else {
-        adminPanel.style.display = 'none';
-        heroSection.style.display = 'block';
-        songListSection.style.display = 'block';
-        switchAdminBtn.innerHTML = '<i class="fa-solid fa-shield"></i> <span data-i18n="nav-admin">Chuyển sang Admin</span>';
         updateSidebarForRole('user');
+        switchTab(navHomeBtn, 'home');
     }
 }
 
@@ -600,24 +593,40 @@ function updateSidebarForRole(role) {
     }
 }
 
-function showAdminSection(type, btn) {
-    if (btn) {
-        document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    // Ensure Admin Panel is visible and others are hidden
-    if (adminPanel) adminPanel.style.display = 'block';
+function hideAllSections() {
+    if (adminPanel) adminPanel.style.display = 'none';
     if (heroSection) heroSection.style.display = 'none';
     if (songListSection) songListSection.style.display = 'none';
     if (profileSection) profileSection.style.display = 'none';
+    
+    // Reset sidebar active states
+    document.querySelectorAll('.nav-menu li, .playlists li').forEach(li => li.classList.remove('active'));
+}
 
+function switchTab(btn, tab) {
+    hideAllSections();
+    if (btn) btn.classList.add('active');
+    
+    if (searchInput) searchInput.value = '';
+    const list = tab === 'liked' ? songs.filter(s => likedSongs.includes(s.id)) : tab === 'explore' ? [...songs].sort(() => 0.5 - Math.random()) : songs;
+    renderSongs(list);
+    
+    const isHome = tab === 'home';
+    if (songListSection) songListSection.style.display = 'block';
+    if (heroSection) heroSection.style.display = isHome ? 'block' : 'none';
+}
+
+function showAdminSection(type, btn) {
+    hideAllSections();
+    if (btn) btn.classList.add('active');
+
+    if (adminPanel) adminPanel.style.display = 'block';
+    
     adminMusicTable.style.display = 'none';
     adminUserTable.style.display = 'none';
     adminLogsTable.style.display = 'none';
 
-
-    // Update real stats on refresh
+    // Update real stats
     if (statTotalSongs) statTotalSongs.textContent = songs.length;
     if (statTotalUsers) statTotalUsers.textContent = users.length;
     if (statVisitors) statVisitors.textContent = totalVisitors.toLocaleString();
@@ -654,13 +663,12 @@ async function recordLoginLog(username) {
         device: getDeviceFromUA()
     };
     
-    loginLogs.unshift(newLog); // Add to top
-    if (loginLogs.length > 50) loginLogs.pop(); // Keep last 50
+    loginLogs.unshift(newLog);
+    if (loginLogs.length > 50) loginLogs.pop();
     localStorage.setItem('vibraze_login_logs', JSON.stringify(loginLogs));
 }
 
 function recordVisit() {
-    // Only count as new visit per session to avoid spamming
     if (!sessionStorage.getItem('vibraze_visit_tracked')) {
         totalVisitors++;
         localStorage.setItem('vibraze_visitor_count', totalVisitors);
@@ -674,7 +682,6 @@ function getDeviceFromUA() {
     if (/tablet/i.test(ua)) return "Tablet Device";
     return "Desktop / PC";
 }
-
 
 function renderAdminMusic() {
     if (!musicTbody) return;
@@ -733,7 +740,6 @@ function renderAdminLogs() {
     });
 }
 
-
 function handleLogout() {
     sessionStorage.removeItem('vibraze_session');
     location.reload();
@@ -766,31 +772,21 @@ function renderSongs(songsToRender) {
 }
 
 function toggleRole() {
+    hideAllSections();
     if (currentRole === 'admin') {
         currentRole = 'user';
         if (switchAdminBtn) switchAdminBtn.innerHTML = '<i class="fa-solid fa-shield"></i> <span data-i18n="nav-admin">Chuyển sang Admin</span>';
-        adminPanel.style.display = 'none';
-        heroSection.style.display = 'block';
-        songListSection.style.display = 'block';
         updateSidebarForRole('user');
+        switchTab(navHomeBtn, 'home');
     } else {
         currentRole = 'admin';
         if (switchAdminBtn) switchAdminBtn.innerHTML = '<i class="fa-solid fa-user"></i> <span data-i18n="nav-user">Chuyển sang User</span>';
-        adminPanel.style.display = 'block';
-        heroSection.style.display = 'none';
-        songListSection.style.display = 'none';
         updateSidebarForRole('admin');
         showAdminSection('music');
     }
     
-    // Hide other overlapping panels
-    if (profileSection) profileSection.style.display = 'none';
-    document.querySelectorAll('.nav-menu li, .playlists li').forEach(li => li.classList.remove('active'));
-    
-    // Hide the dropdown menu upon click
     if (userDropdown) userDropdown.classList.remove('active');
     
-    // update current user in mock db just to persist role locally for display if needed
     if (currentUser) {
         currentUser.role = currentRole;
         roleBadge.textContent = currentRole;
@@ -923,22 +919,11 @@ function updateModalInfo() {
 
 function openProfile() {
     if (!currentUser) return;
-    
-    // Populate data
+    hideAllSections();
     profileNameDisplay.textContent = currentUser.name;
     profileUsernameDisplay.textContent = `@${currentUser.username}`;
     profileAvatarImg.src = `https://ui-avatars.com/api/?name=${currentUser.name}&background=${currentUser.role === 'admin' ? 'f59e0b' : '6366f1'}&color=fff&size=200`;
-    
-    // Show UI
-    heroSection.style.display = 'none';
-    songListSection.style.display = 'none';
-    adminPanel.style.display = 'none';
     profileSection.style.display = 'block';
-    
-    // Remove other active states
-    document.querySelectorAll('.nav-menu li, .playlists li').forEach(li => li.classList.remove('active'));
-    
-    // Default to 'All' tab
     profileTabs.forEach(t => t.classList.remove('active'));
     profileTabs[0].classList.add('active');
     updateProfileContent('All');
@@ -950,7 +935,7 @@ function handleAvatarUpload(e) {
         const reader = new FileReader();
         reader.onload = (event) => {
             profileAvatarImg.src = event.target.result;
-            userAvatar.src = event.target.result; // Update top nav too
+            userAvatar.src = event.target.result;
             alert("Avatar đã được cập nhật thành công!");
         };
         reader.readAsDataURL(file);
@@ -959,13 +944,12 @@ function handleAvatarUpload(e) {
 
 function updateProfileContent(tabName) {
     profileContentBody.innerHTML = '';
-    
     if (tabName === 'All' || tabName === 'Tracks') {
         const likedList = songs.filter(s => likedSongs.includes(s.id));
         if (likedList.length > 0) {
             likedList.forEach(song => {
                 const item = document.createElement('div');
-                item.className = 'song-card'; // Reuse existing styles
+                item.className = 'song-card';
                 item.innerHTML = `
                     <div class="img-wrap">
                         <img src="${song.cover}" alt="${song.title}">
@@ -980,7 +964,6 @@ function updateProfileContent(tabName) {
                 });
                 profileContentBody.appendChild(item);
             });
-            // Apply grid layout specifically for profile content
             profileContentBody.style.display = 'grid';
             profileContentBody.style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
             profileContentBody.style.gap = '20px';
@@ -994,18 +977,4 @@ function updateProfileContent(tabName) {
     }
 }
 
-function switchTab(btn, tab) {
-    document.querySelectorAll('.nav-menu li, .playlists li').forEach(li => li.classList.remove('active'));
-    btn.classList.add('active');
-    if (searchInput) searchInput.value = '';
-    const list = tab === 'liked' ? songs.filter(s => likedSongs.includes(s.id)) : tab === 'explore' ? [...songs].sort(() => 0.5 - Math.random()) : songs;
-    renderSongs(list);
-    const isHome = tab === 'home';
-    if (songListSection) songListSection.style.display = 'block';
-    if (heroSection) heroSection.style.display = isHome ? 'block' : 'none';
-    if (adminPanel) adminPanel.style.display = 'none';
-    if (profileSection) profileSection.style.display = 'none';
-}
-
-// Start
 document.addEventListener('DOMContentLoaded', init);
