@@ -1,9 +1,11 @@
-export function updateGreeting(greetingText, currentLang) {
+export function updateGreeting(greetingText, currentLang, userName = "") {
     const h = new Date().getHours();
     let txtVI = h < 12 ? "Chào buổi sáng" : h < 18 ? "Chào buổi chiều" : "Chào buổi tối";
     let txtEN = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+    
+    let base = currentLang === 'en' ? txtEN : txtVI;
     if (greetingText) {
-        greetingText.textContent = currentLang === 'en' ? txtEN : txtVI;
+        greetingText.textContent = userName ? `${base} ${userName}` : base;
     }
 }
 

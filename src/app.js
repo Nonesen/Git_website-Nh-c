@@ -217,7 +217,8 @@ function init() {
         loadSong(s); 
         playerEngine.playSong(); 
     });
-    ui.updateGreeting(greetingText, currentLang);
+    const savedUser = JSON.parse(sessionStorage.getItem('vibraze_session'));
+    ui.updateGreeting(greetingText, currentLang, savedUser ? savedUser.name : "");
     loadSong(songs[0]);
     checkAuth();
 }
@@ -319,7 +320,7 @@ function loginUser(user) {
     authOverlay.classList.remove('active');
     headerGuest.style.display = 'none';
     userProfileTrigger.style.display = 'flex';
-    greetingText.textContent = `Chào ${user.name}`;
+    ui.updateGreeting(greetingText, currentLang, user.name);
     const avatarApi = `https://ui-avatars.com/api/?name=${user.name}&background=${user.role === 'admin' ? 'f59e0b' : '6366f1'}&color=fff`;
     userAvatar.src = avatarApi;
     
@@ -374,7 +375,8 @@ function setLanguage(lang) {
         o.classList.toggle('active', isActive);
         o.querySelector('.check-icon').style.display = isActive ? 'inline-block' : 'none';
     });
-    ui.updateGreeting(greetingText, lang);
+    const savedUser = JSON.parse(sessionStorage.getItem('vibraze_session'));
+    ui.updateGreeting(greetingText, lang, savedUser ? savedUser.name : "");
 }
 
 function toggleLike() {

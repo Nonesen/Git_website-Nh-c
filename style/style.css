@@ -127,6 +127,8 @@ h1, h2, h3, .logo span {
     align-items: center;
     margin-bottom: 2rem;
     gap: 20px;
+    position: relative;
+    z-index: 9999; /* Ensure it is above the hero section */
 }
 
 .header-actions {
@@ -144,6 +146,7 @@ h1, h2, h3, .logo span {
     border-radius: 50px;
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(10px);
+    z-index: 1006;
 }
 
 .header-clock {
