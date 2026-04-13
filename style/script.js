@@ -170,12 +170,11 @@ let profileSection, profileAvatarImg, profileNameDisplay, profileUsernameDisplay
 let profileTabs, profileContentBody, userDropdown, userProfileTrigger;
 let settingsTrigger, settingsDropdown, settingsMenuMain, settingsMenuLang, langMenuBtn, langBackBtn, langOptions;
 let musicTbody, userTbody, logsTbody, adminMusicTable, adminUserTable, adminLogsTable, adminPanelTitle;
+let statVisitors, statTotalSongs, statTotalUsers;
 
-let loginLogs = [
-    { user: 'admin', time: '2026-04-14 02:30:15', location: 'Hà Nội, VN', device: 'Chrome / Windows' },
-    { user: 'user', time: '2026-04-14 01:15:22', location: 'TP.HCM, VN', device: 'Safari / iPhone' },
-    { user: 'admin', time: '2026-04-13 22:45:10', location: 'Đà Nẵng, VN', device: 'Firefox / Linux' }
-];
+let loginLogs = JSON.parse(localStorage.getItem('vibraze_login_logs')) || [];
+let totalVisitors = parseInt(localStorage.getItem('vibraze_visitor_count')) || 0;
+
 
 
 let likedSongs = JSON.parse(localStorage.getItem('vibraze_likes')) || [];
@@ -273,6 +272,9 @@ function init() {
     adminUserTable = document.getElementById('admin-user-table');
     adminLogsTable = document.getElementById('admin-logs-table');
     adminPanelTitle = document.getElementById('admin-panel-title');
+    statVisitors = document.getElementById('stat-visitors');
+    statTotalSongs = document.getElementById('stat-total-songs');
+    statTotalUsers = document.getElementById('stat-total-users');
 
     // Admin Sidebar Listeners
     const navAdminManage = document.getElementById('nav-admin-manage');
@@ -282,6 +284,10 @@ function init() {
     if (navAdminManage) navAdminManage.addEventListener('click', () => showAdminSection('music', navAdminManage));
     if (navAdminUsers) navAdminUsers.addEventListener('click', () => showAdminSection('users', navAdminUsers));
     if (navAdminStats) navAdminStats.addEventListener('click', () => showAdminSection('logs', navAdminStats));
+
+    // Track Visit
+    recordVisit();
+
 
 
     // Attach Main Interaction Listeners
@@ -511,11 +517,13 @@ function handleLogin() {
     const pVal = loginPassInp.value;
     const user = users.find(u => u.username === uVal && u.password === pVal);
     if (user) {
+        recordLoginLog(user.username);
         loginUser(user);
     } else {
         alert("Sai tài khoản hoặc mật khẩu!");
     }
 }
+
 
 function handleSignup() {
     const name = signupNameInp.value;
@@ -594,6 +602,11 @@ function showAdminSection(type, btn) {
     adminUserTable.style.display = 'none';
     adminLogsTable.style.display = 'none';
 
+    // Update real stats on refresh
+    if (statTotalSongs) statTotalSongs.textContent = songs.length;
+    if (statTotalUsers) statTotalUsers.textContent = users.length;
+    if (statVisitors) statVisitors.textContent = totalVisitors.toLocaleString();
+
     if (type === 'music') {
         adminPanelTitle.textContent = "Quản lý bài hát";
         adminMusicTable.style.display = 'block';
@@ -608,6 +621,45 @@ function showAdminSection(type, btn) {
         renderAdminLogs();
     }
 }
+
+async function recordLoginLog(username) {
+    let location = "Unknown";
+    try {
+        const resp = await fetch('https://ipapi.co/json/');
+        const data = await resp.json();
+        location = `${data.city}, ${data.country_name}`;
+    } catch (e) {
+        location = "Vị trí không xác định";
+    }
+
+    const newLog = {
+        user: username,
+        time: new Date().toLocaleString('vi-VN'),
+        location: location,
+        device: getDeviceFromUA()
+    };
+    
+    loginLogs.unshift(newLog); // Add to top
+    if (loginLogs.length > 50) loginLogs.pop(); // Keep last 50
+    localStorage.setItem('vibraze_login_logs', JSON.stringify(loginLogs));
+}
+
+function recordVisit() {
+    // Only count as new visit per session to avoid spamming
+    if (!sessionStorage.getItem('vibraze_visit_tracked')) {
+        totalVisitors++;
+        localStorage.setItem('vibraze_visitor_count', totalVisitors);
+        sessionStorage.setItem('vibraze_visit_tracked', 'true');
+    }
+}
+
+function getDeviceFromUA() {
+    const ua = navigator.userAgent;
+    if (/mobile/i.test(ua)) return "Mobile Device";
+    if (/tablet/i.test(ua)) return "Tablet Device";
+    return "Desktop / PC";
+}
+
 
 function renderAdminMusic() {
     if (!musicTbody) return;
