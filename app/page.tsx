@@ -53,7 +53,10 @@ export default function Home() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       
       <main className="content">
-        <Header setActiveTab={setActiveTab} />
+        <Header 
+          setActiveTab={setActiveTab} 
+          onLoginClick={() => setIsAuthModalOpen(true)}
+        />
 
         {activeTab === 'home' && (
           <section className="hero-section">

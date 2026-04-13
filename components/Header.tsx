@@ -8,9 +8,10 @@ import RealTimeClock from './RealTimeClock';
 
 interface HeaderProps {
     setActiveTab: (tab: string) => void;
+    onLoginClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
+const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick }) => {
     const { t, language, setLanguage } = useLanguage();
     const { user, login, logout } = useAuth();
     const { theme, setTheme } = useTheme();
@@ -42,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
             <div className="header-actions">
                 {!user ? (
                     <div className="header-guest">
-                        <button className="btn-login-header" onClick={() => login('user', '123')}>
+                        <button className="btn-login-header" onClick={onLoginClick}>
                             {t('header-login')}
                         </button>
                     </div>
