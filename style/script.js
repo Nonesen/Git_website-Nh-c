@@ -169,6 +169,14 @@ let playerTitle, playerArtist, playerImg, modal, openModalBtn, closeModalBtn, mo
 let profileSection, profileAvatarImg, profileNameDisplay, profileUsernameDisplay, navProfileBtn, avatarUpload;
 let profileTabs, profileContentBody, userDropdown, userProfileTrigger;
 let settingsTrigger, settingsDropdown, settingsMenuMain, settingsMenuLang, langMenuBtn, langBackBtn, langOptions;
+let musicTbody, userTbody, logsTbody, adminMusicTable, adminUserTable, adminLogsTable, adminPanelTitle;
+
+let loginLogs = [
+    { user: 'admin', time: '2026-04-14 02:30:15', location: 'Hà Nội, VN', device: 'Chrome / Windows' },
+    { user: 'user', time: '2026-04-14 01:15:22', location: 'TP.HCM, VN', device: 'Safari / iPhone' },
+    { user: 'admin', time: '2026-04-13 22:45:10', location: 'Đà Nẵng, VN', device: 'Firefox / Linux' }
+];
+
 
 let likedSongs = JSON.parse(localStorage.getItem('vibraze_likes')) || [];
 
@@ -257,6 +265,24 @@ function init() {
     langMenuBtn = document.getElementById('lang-menu-btn');
     langBackBtn = document.getElementById('lang-back-btn');
     langOptions = document.querySelectorAll('.lang-option');
+
+    musicTbody = document.getElementById('music-tbody');
+    userTbody = document.getElementById('user-tbody');
+    logsTbody = document.getElementById('logs-tbody');
+    adminMusicTable = document.getElementById('admin-music-table');
+    adminUserTable = document.getElementById('admin-user-table');
+    adminLogsTable = document.getElementById('admin-logs-table');
+    adminPanelTitle = document.getElementById('admin-panel-title');
+
+    // Admin Sidebar Listeners
+    const navAdminManage = document.getElementById('nav-admin-manage');
+    const navAdminUsers = document.getElementById('nav-admin-users');
+    const navAdminStats = document.getElementById('nav-admin-stats');
+
+    if (navAdminManage) navAdminManage.addEventListener('click', () => showAdminSection('music', navAdminManage));
+    if (navAdminUsers) navAdminUsers.addEventListener('click', () => showAdminSection('users', navAdminUsers));
+    if (navAdminStats) navAdminStats.addEventListener('click', () => showAdminSection('logs', navAdminStats));
+
 
     // Attach Main Interaction Listeners
     if (loginSubmit) loginSubmit.addEventListener('click', handleLogin);
@@ -533,14 +559,113 @@ function loginUser(user) {
         adminPanel.style.display = 'block';
         heroSection.style.display = 'none';
         songListSection.style.display = 'none';
-        switchAdminBtn.textContent = 'Chuyển sang User';
+        switchAdminBtn.innerHTML = '<i class="fa-solid fa-user"></i> <span data-i18n="nav-user">Chuyển sang User</span>';
+        updateSidebarForRole('admin');
+        showAdminSection('music'); // Default admin view
     } else {
         adminPanel.style.display = 'none';
         heroSection.style.display = 'block';
         songListSection.style.display = 'block';
-        switchAdminBtn.textContent = 'Chuyển sang Admin';
+        switchAdminBtn.innerHTML = '<i class="fa-solid fa-shield"></i> <span data-i18n="nav-admin">Chuyển sang Admin</span>';
+        updateSidebarForRole('user');
     }
 }
+
+function updateSidebarForRole(role) {
+    const userItems = document.querySelectorAll('.user-only');
+    const adminItems = document.querySelectorAll('.admin-only');
+    
+    if (role === 'admin') {
+        userItems.forEach(el => el.style.display = 'none');
+        adminItems.forEach(el => el.style.display = 'flex');
+    } else {
+        userItems.forEach(el => el.style.display = 'flex');
+        adminItems.forEach(el => el.style.display = 'none');
+    }
+}
+
+function showAdminSection(type, btn) {
+    if (btn) {
+        document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    adminMusicTable.style.display = 'none';
+    adminUserTable.style.display = 'none';
+    adminLogsTable.style.display = 'none';
+
+    if (type === 'music') {
+        adminPanelTitle.textContent = "Quản lý bài hát";
+        adminMusicTable.style.display = 'block';
+        renderAdminMusic();
+    } else if (type === 'users') {
+        adminPanelTitle.textContent = "Danh sách tài khoản";
+        adminUserTable.style.display = 'block';
+        renderAdminUsers();
+    } else if (type === 'logs') {
+        adminPanelTitle.textContent = "Lịch sử hệ thống";
+        adminLogsTable.style.display = 'block';
+        renderAdminLogs();
+    }
+}
+
+function renderAdminMusic() {
+    if (!musicTbody) return;
+    musicTbody.innerHTML = '';
+    songs.forEach(song => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>#${song.id}</td>
+            <td><img src="${song.cover}" alt=""></td>
+            <td>${song.title}</td>
+            <td>${song.artist}</td>
+            <td>
+                <div class="admin-actions">
+                    <button class="btn-action" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-action delete" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        musicTbody.appendChild(tr);
+    });
+}
+
+function renderAdminUsers() {
+    if (!userTbody) return;
+    userTbody.innerHTML = '';
+    users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${u.username}</td>
+            <td>${u.name}</td>
+            <td>${u.email || 'N/A'}</td>
+            <td><span class="role-badge" style="background: ${u.role === 'admin' ? '#f59e0b' : 'var(--primary-color)'}; font-size: 0.6rem;">${u.role}</span></td>
+            <td>
+                <div class="admin-actions">
+                    <button class="btn-action" title="Chỉnh sửa"><i class="fa-solid fa-user-pen"></i></button>
+                    <button class="btn-action delete" title="Khóa"><i class="fa-solid fa-ban"></i></button>
+                </div>
+            </td>
+        `;
+        userTbody.appendChild(tr);
+    });
+}
+
+function renderAdminLogs() {
+    if (!logsTbody) return;
+    logsTbody.innerHTML = '';
+    loginLogs.forEach(log => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${log.user}</strong></td>
+            <td>${log.time}</td>
+            <td>${log.location}</td>
+            <td><i class="fa-solid fa-desktop"></i> ${log.device}</td>
+        `;
+        logsTbody.appendChild(tr);
+    });
+}
+
 
 function handleLogout() {
     sessionStorage.removeItem('vibraze_session');
@@ -580,12 +705,15 @@ function toggleRole() {
         adminPanel.style.display = 'none';
         heroSection.style.display = 'block';
         songListSection.style.display = 'block';
+        updateSidebarForRole('user');
     } else {
         currentRole = 'admin';
         if (switchAdminBtn) switchAdminBtn.innerHTML = '<i class="fa-solid fa-user"></i> <span data-i18n="nav-user">Chuyển sang User</span>';
         adminPanel.style.display = 'block';
         heroSection.style.display = 'none';
         songListSection.style.display = 'none';
+        updateSidebarForRole('admin');
+        showAdminSection('music');
     }
     
     // Hide other overlapping panels
