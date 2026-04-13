@@ -595,12 +595,19 @@ function updateSidebarForRole(role) {
 
     if (role === 'admin') {
         userItems.forEach(el => el.style.display = 'none');
-        adminItems.forEach(el => el.style.display = 'flex');
+        adminItems.forEach(el => {
+            // Check if it's a list item or a container
+            if (el.tagName === 'LI') el.style.display = 'flex';
+            else el.style.display = 'block';
+        });
         
         // Admin: Only Logout is needed (Profile hidden)
         if (profileBtn) profileBtn.style.display = 'none';
     } else {
-        userItems.forEach(el => el.style.display = 'flex');
+        userItems.forEach(el => {
+            if (el.tagName === 'LI') el.style.display = 'flex';
+            else el.style.display = 'block';
+        });
         adminItems.forEach(el => el.style.display = 'none');
         
         // User: Profile and Logout needed
