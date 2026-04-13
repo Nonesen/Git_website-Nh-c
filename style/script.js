@@ -170,10 +170,11 @@ let profileSection, profileAvatarImg, profileNameDisplay, profileUsernameDisplay
 let profileTabs, profileContentBody, userDropdown, userProfileTrigger;
 let settingsTrigger, settingsDropdown, settingsMenuMain, settingsMenuLang, langMenuBtn, langBackBtn, langOptions;
 let musicTbody, userTbody, logsTbody, adminMusicTable, adminUserTable, adminLogsTable, adminPanelTitle;
-let statVisitors, statTotalSongs, statTotalUsers;
+let statVisitors, statTotalSongs, statTotalUsers, statTotalListens;
 
 let loginLogs = JSON.parse(localStorage.getItem('vibraze_login_logs')) || [];
 let totalVisitors = parseInt(localStorage.getItem('vibraze_visitor_count')) || 0;
+let totalListens = parseInt(localStorage.getItem('vibraze_listen_count')) || 0;
 
 
 
@@ -275,6 +276,7 @@ function init() {
     statVisitors = document.getElementById('stat-visitors');
     statTotalSongs = document.getElementById('stat-total-songs');
     statTotalUsers = document.getElementById('stat-total-users');
+    statTotalListens = document.getElementById('stat-total-listens');
 
     // Admin Sidebar Listeners
     const navAdminManage = document.getElementById('nav-admin-manage');
@@ -630,6 +632,7 @@ function showAdminSection(type, btn) {
     if (statTotalSongs) statTotalSongs.textContent = songs.length;
     if (statTotalUsers) statTotalUsers.textContent = users.length;
     if (statVisitors) statVisitors.textContent = totalVisitors.toLocaleString();
+    if (statTotalListens) statTotalListens.textContent = totalListens.toLocaleString();
 
     if (type === 'music') {
         adminPanelTitle.textContent = "Quản lý bài hát";
@@ -675,6 +678,14 @@ function recordVisit() {
         sessionStorage.setItem('vibraze_visit_tracked', 'true');
     }
 }
+
+function recordListen() {
+    totalListens++;
+    localStorage.setItem('vibraze_listen_count', totalListens);
+    // Update display if currently in admin panel
+    if (statTotalListens) statTotalListens.textContent = totalListens.toLocaleString();
+}
+
 
 function getDeviceFromUA() {
     const ua = navigator.userAgent;
@@ -798,6 +809,12 @@ function toggleRole() {
 
 function loadSong(song) {
     if (!song || !playerTitle) return;
+    
+    // If a song is currently playing, treat switching as 1 listen
+    if (isPlaying && audio && !audio.paused) {
+        recordListen();
+    }
+
     playerTitle.textContent = song.title;
     playerArtist.textContent = song.artist;
     playerImg.src = song.cover;
@@ -806,6 +823,7 @@ function loadSong(song) {
     updateLikeButton();
     if (modal && modal.classList.contains('active')) updateModalInfo();
 }
+
 
 function playSong() {
     isPlaying = true;
@@ -864,7 +882,10 @@ function setVolume() {
 
 function toggleShuffle() { isShuffle = !isShuffle; shuffleBtn.classList.toggle('active', isShuffle); }
 function toggleRepeat() { isRepeat = !isRepeat; repeatBtn.classList.toggle('active', isRepeat); }
-function handleEnded() { isRepeat ? playSong() : nextSong(); }
+function handleEnded() { 
+    recordListen(); // Count listen on finish
+    isRepeat ? playSong() : nextSong(); 
+}
 
 function handleSearch(e) {
     const term = e.target.value.toLowerCase();
