@@ -119,6 +119,27 @@ function init() {
         localStorage.setItem('vibraze_users', JSON.stringify(initialUsers));
         auth.setUsers(initialUsers);
     }
+    
+    // Quick migration for the demo user name change
+    const storedUsers = JSON.parse(localStorage.getItem('vibraze_users'));
+    if (storedUsers) {
+        let changed = false;
+        storedUsers.forEach(u => {
+            if (u.username === 'user' && u.name === 'Người dùng Demo') {
+                u.name = 'người dùng';
+                changed = true;
+            }
+        });
+        if (changed) {
+            localStorage.setItem('vibraze_users', JSON.stringify(storedUsers));
+            auth.setUsers(storedUsers);
+            const session = JSON.parse(sessionStorage.getItem('vibraze_session'));
+            if (session && session.username === 'user') {
+                session.name = 'người dùng';
+                sessionStorage.setItem('vibraze_session', JSON.stringify(session));
+            }
+        }
+    }
 
     // 3. Global Listeners
     const logo = document.querySelector('.logo');

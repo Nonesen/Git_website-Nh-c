@@ -154,5 +154,5 @@ export const translations = {
 // Users data (initial)
 export const initialUsers = [
     { username: 'admin', password: '123', name: 'Quản trị viên', role: 'admin' },
-    { username: 'user', password: '123', name: 'Người dùng Demo', role: 'user' }
+    { username: 'user', password: '123', name: 'người dùng', role: 'user' }
 ];
