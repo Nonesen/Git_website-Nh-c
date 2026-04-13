@@ -129,6 +129,12 @@ h1, h2, h3, .logo span {
     gap: 20px;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .search-bar {
     display: flex;
     align-items: center;
