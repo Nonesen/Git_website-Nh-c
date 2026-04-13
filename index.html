@@ -96,6 +96,7 @@
             <nav class="nav-menu">
                 <ul id="main-nav-list">
                     <li class="active" id="nav-home"><i class="fa-solid fa-house"></i> <span data-i18n="nav-home">Trang chủ</span></li>
+                    <li id="nav-recent" class="user-only"><i class="fa-solid fa-clock-rotate-left"></i> <span data-i18n="nav-recent">Nghe gần đây</span></li>
                     <li id="nav-explore" class="user-only"><i class="fa-solid fa-compass"></i> <span data-i18n="nav-explore">Khám phá</span></li>
                     <li id="nav-library" class="user-only"><i class="fa-solid fa-music"></i> <span data-i18n="nav-library">Thư viện</span></li>
                     <li id="nav-admin-manage" class="admin-only" style="display: none;"><i class="fa-solid fa-list-check"></i> <span>Quản lý nhạc</span></li>
@@ -127,43 +128,46 @@
                         <button id="header-login-btn" class="btn-login-header" data-i18n="header-login">Đăng nhập</button>
                     </div>
 
-                    <!-- Global Toggleable Settings Icon -->
-                    <div class="header-settings" id="settings-trigger">
-                        <i class="fa-solid fa-gear"></i>
-                        <div class="settings-dropdown" id="settings-dropdown">
-                            <div class="settings-menu-main" id="settings-menu-main">
-                                <div class="settings-menu-item" id="lang-menu-btn">
-                                    <div class="item-left"><i class="fa-solid fa-language"></i> <span data-i18n="settings-lang">Ngôn ngữ</span></div>
-                                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                                </div>
-                                <div class="settings-menu-item">
-                                    <div class="item-left"><i class="fa-regular fa-comment-dots"></i> <span data-i18n="settings-feedback">Góp ý</span></div>
-                                </div>
-                            </div>
-                            <div class="settings-menu-lang" id="settings-menu-lang" style="display: none;">
-                                <div class="submenu-header" id="lang-back-btn">
-                                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="settings-back">Quay lại</span>
-                                </div>
-                                <div class="lang-option active" data-lang="vi">
-                                    Tiếng Việt <i class="fa-solid fa-check check-icon"></i>
-                                </div>
-                                <div class="lang-option" data-lang="en">
-                                    English <i class="fa-solid fa-check check-icon" style="display: none;"></i>
-                                </div>
+                    <!-- User Profile & Settings Area -->
+                    <div class="user-row-group" id="user-profile-trigger" style="display: none;">
+                        <span id="greeting-text">Chào buổi chiều</span>
+                        <div id="header-clock" class="header-clock">00:00:00</div>
+                        
+                        <div class="user-avatar-wrap">
+                            <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Avatar" id="user-avatar">
+                            <i class="fa-solid fa-chevron-down dropdown-arrow"></i>
+                            <div class="user-dropdown" id="user-dropdown">
+                                <button id="nav-profile-btn"><i class="fa-solid fa-user"></i> <span data-i18n="nav-profile">Hồ sơ</span></button>
+                                <button id="switch-admin-btn"><i class="fa-solid fa-shield"></i> <span data-i18n="nav-admin">Chuyển sang Admin</span></button>
+                                <button id="logout-btn" style="color: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="nav-logout">Đăng xuất</span></button>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- User Profile (Logged In) -->
-                    <div class="user-profile" id="user-profile-trigger" style="display: none;">
-                        <span id="greeting-text">Chào buổi chiều</span>
-                        <div class="role-badge" id="role-badge">User</div>
-                        <img src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" alt="Avatar" id="user-avatar">
-                        <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; opacity: 0.6; margin-left: 5px;"></i>
-                        <div class="user-dropdown" id="user-dropdown">
-                            <button id="nav-profile-btn"><i class="fa-solid fa-user"></i> <span data-i18n="nav-profile">Hồ sơ</span></button>
-                            <button id="switch-admin-btn"><i class="fa-solid fa-shield"></i> <span data-i18n="nav-admin">Chuyển sang Admin</span></button>
-                            <button id="logout-btn" style="color: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="nav-logout">Đăng xuất</span></button>
+                        <!-- Global Toggleable Settings Icon -->
+                        <div class="header-settings" id="settings-trigger">
+                            <i class="fa-solid fa-gear"></i>
+                            <div class="settings-dropdown" id="settings-dropdown">
+                                <div class="settings-menu-main" id="settings-menu-main">
+                                    <div class="settings-menu-item" id="lang-menu-btn">
+                                        <div class="item-left"><i class="fa-solid fa-language"></i> <span data-i18n="settings-lang">Ngôn ngữ</span></div>
+                                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                                    </div>
+                                    <div class="settings-menu-item">
+                                        <div class="item-left"><i class="fa-regular fa-comment-dots"></i> <span data-i18n="settings-feedback">Góp ý</span></div>
+                                    </div>
+                                </div>
+                                <div class="settings-menu-lang" id="settings-menu-lang" style="display: none;">
+                                    <div class="submenu-header" id="lang-back-btn">
+                                        <i class="fa-solid fa-arrow-left"></i> <span data-i18n="settings-back">Quay lại</span>
+                                    </div>
+                                    <div class="lang-option active" data-lang="vi">
+                                        Tiếng Việt <i class="fa-solid fa-check check-icon"></i>
+                                    </div>
+                                    <div class="lang-option" data-lang="en">
+                                        English <i class="fa-solid fa-check check-icon" style="display: none;"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -174,7 +178,6 @@
                 <div class="hero-content">
                     <h1 data-i18n="hero-title">Khám phá âm nhạc mới</h1>
                     <p data-i18n="hero-subtitle">Hàng ngàn bài hát đang chờ đợi bạn tại Vibraze.</p>
-                    <button class="btn-play-all" id="btn-play-all" data-i18n="btn-play-all">Phát tất cả</button>
                 </div>
             </section>
 

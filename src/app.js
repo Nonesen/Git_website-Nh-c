@@ -7,9 +7,9 @@ import * as admin from './admin.js';
 
 // Elements
 let audio, playPauseBtn, prevBtn, nextBtn, shuffleBtn, repeatBtn, progressBar, progressFilled;
-let currentTimeEl, durationTimeEl, volumeBar, volumeIcon, songGrid, searchInput, greetingText;
-let songCountEl, navHomeBtn, navExploreBtn, navLibraryBtn, navLikedBtn, btnPlayAll, likeBtn, likeIcon;
-let roleBadge, switchAdminBtn, adminPanel, heroSection, songListSection, userAvatar, profileSection;
+let currentTimeEl, durationTimeEl, volumeBar, volumeIcon, songGrid, searchInput, greetingText, headerClock;
+let songCountEl, navHomeBtn, navRecentBtn, navExploreBtn, navLibraryBtn, navLikedBtn, likeBtn, likeIcon;
+let switchAdminBtn, adminPanel, heroSection, songListSection, userAvatar, profileSection;
 let authOverlay, mainApp, loginForm, signupForm, toSignup, toLogin, logoutBtn, headerGuest, headerLoginBtn, closeAuthBtn;
 let loginUserInp, loginPassInp, signupNameInp, signupEmailInp, signupPhoneInp, signupUserInp, signupPassInp, loginSubmit, signupSubmit;
 let toggleLoginPass, toggleSignupPass, playerTitle, playerArtist, playerImg, modal, openModalBtn, closeModalBtn, modalTitle, modalArtist, modalImg, discWrapper;
@@ -39,15 +39,15 @@ function init() {
     songGrid = document.getElementById('song-grid');
     searchInput = document.getElementById('search-input');
     greetingText = document.getElementById('greeting-text');
+    headerClock = document.getElementById('header-clock');
     songCountEl = document.getElementById('song-count');
     navHomeBtn = document.getElementById('nav-home');
+    navRecentBtn = document.getElementById('nav-recent');
     navExploreBtn = document.getElementById('nav-explore');
     navLibraryBtn = document.getElementById('nav-library');
     navLikedBtn = document.getElementById('nav-liked');
-    btnPlayAll = document.getElementById('btn-play-all');
     likeBtn = document.querySelector('.like-btn');
     if (likeBtn) likeIcon = likeBtn.querySelector('i');
-    roleBadge = document.getElementById('role-badge');
     switchAdminBtn = document.getElementById('switch-admin-btn');
     adminPanel = document.getElementById('admin-panel');
     heroSection = document.querySelector('.hero-section');
@@ -129,6 +129,7 @@ function init() {
 
     // Navigation
     if (navHomeBtn) navHomeBtn.addEventListener('click', () => switchTab(navHomeBtn, 'home'));
+    if (navRecentBtn) navRecentBtn.addEventListener('click', () => switchTab(navRecentBtn, 'recent'));
     if (navExploreBtn) navExploreBtn.addEventListener('click', () => switchTab(navExploreBtn, 'explore'));
     if (navLibraryBtn) navLibraryBtn.addEventListener('click', () => switchTab(navLibraryBtn, 'library'));
     if (navLikedBtn) navLikedBtn.addEventListener('click', () => switchTab(navLikedBtn, 'liked'));
@@ -209,6 +210,7 @@ function init() {
 
     // 4. Final Start
     stats.recordVisit();
+    startClock();
     setLanguage(currentLang);
     ui.renderSongs(songGrid, songs, currentLang, songCountEl, (s) => { 
         playerEngine.setIndex(songs.indexOf(s)); 
@@ -220,10 +222,26 @@ function init() {
     checkAuth();
 }
 
+function startClock() {
+    const update = () => {
+        if (!headerClock) return;
+        const now = new Date();
+        headerClock.textContent = now.toLocaleTimeString('vi-VN', { hour12: false });
+    };
+    setInterval(update, 1000);
+    update();
+}
+
 // Logic Helpers
 function loadSong(song) {
     if (!song) return;
     if (player.isPlaying && !audio.paused) stats.recordListen(statTotalListens);
+    
+    // Recently Played Logic
+    let recent = JSON.parse(localStorage.getItem('vibraze_recent')) || [];
+    recent = [song.id, ...recent.filter(id => id !== song.id)].slice(0, 20);
+    localStorage.setItem('vibraze_recent', JSON.stringify(recent));
+
     playerTitle.textContent = song.title;
     playerArtist.textContent = song.artist;
     playerImg.src = song.cover;
@@ -265,7 +283,14 @@ function switchTab(btn, tab) {
         ui.renderHomeContent(songGrid, songs, currentLang, songCountEl, (s) => { loadSong(s); playerEngine.playSong(); });
     } else {
         songListSection.style.display = 'block';
-        const list = tab === 'liked' ? songs.filter(s => likedSongs.includes(s.id)) : tab === 'explore' ? [...songs].sort(() => 0.5 - Math.random()) : songs;
+        let list;
+        if (tab === 'liked') list = songs.filter(s => likedSongs.includes(s.id));
+        else if (tab === 'recent') {
+            const recentIds = JSON.parse(localStorage.getItem('vibraze_recent')) || [];
+            list = recentIds.map(id => songs.find(s => s.id === id)).filter(Boolean);
+        } else if (tab === 'explore') list = [...songs].sort(() => 0.5 - Math.random());
+        else list = songs;
+        
         ui.renderSongs(songGrid, list, currentLang, songCountEl, (s) => { loadSong(s); playerEngine.playSong(); });
     }
 }
@@ -295,8 +320,6 @@ function loginUser(user) {
     headerGuest.style.display = 'none';
     userProfileTrigger.style.display = 'flex';
     greetingText.textContent = `Chào ${user.name}`;
-    roleBadge.textContent = user.role;
-    roleBadge.style.background = user.role === 'admin' ? '#f59e0b' : 'var(--primary-color)';
     const avatarApi = `https://ui-avatars.com/api/?name=${user.name}&background=${user.role === 'admin' ? 'f59e0b' : '6366f1'}&color=fff`;
     userAvatar.src = avatarApi;
     

@@ -97,6 +97,7 @@ export const songs = [
 export const translations = {
     vi: {
         "nav-home": "Trang chủ",
+        "nav-recent": "Nghe gần đây",
         "nav-explore": "Khám phá",
         "nav-library": "Thư viện",
         "playlist-title": "PLAYLIST CỦA BẠN",
@@ -123,6 +124,7 @@ export const translations = {
     },
     en: {
         "nav-home": "Home",
+        "nav-recent": "Recently Played",
         "nav-explore": "Explore",
         "nav-library": "Library",
         "playlist-title": "YOUR PLAYLIST",

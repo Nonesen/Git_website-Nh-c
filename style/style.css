@@ -132,7 +132,43 @@ h1, h2, h3, .logo span {
 .header-actions {
     display: flex;
     align-items: center;
+    gap: 20px;
+}
+
+.user-row-group {
+    display: flex;
+    align-items: center;
     gap: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 6px 16px;
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+}
+
+.header-clock {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--cyan-accent);
+    padding: 0 10px;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    min-width: 85px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.user-avatar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.dropdown-arrow {
+    font-size: 0.8rem;
+    opacity: 0.6;
 }
 
 .search-bar {
