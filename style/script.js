@@ -590,20 +590,21 @@ function updateSidebarForRole(role) {
     const profileBtn = document.getElementById('nav-profile-btn');
     const switchBtn = document.getElementById('switch-admin-btn');
 
+    // Always hide the switch button as per latest request
+    if (switchBtn) switchBtn.style.display = 'none';
+
     if (role === 'admin') {
         userItems.forEach(el => el.style.display = 'none');
         adminItems.forEach(el => el.style.display = 'flex');
         
-        // Hide specific buttons for admin in dropdown
+        // Admin: Only Logout is needed (Profile hidden)
         if (profileBtn) profileBtn.style.display = 'none';
-        if (switchBtn) switchBtn.style.display = 'none';
     } else {
         userItems.forEach(el => el.style.display = 'flex');
         adminItems.forEach(el => el.style.display = 'none');
         
-        // Show buttons for user in dropdown
+        // User: Profile and Logout needed
         if (profileBtn) profileBtn.style.display = 'flex';
-        if (switchBtn) switchBtn.style.display = 'flex';
     }
 }
 
