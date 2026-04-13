@@ -288,6 +288,14 @@ function init() {
     // Track Visit
     recordVisit();
 
+    // Logo Reload
+    const logo = document.querySelector('.logo');
+    if (logo) {
+        logo.style.cursor = 'pointer';
+        logo.addEventListener('click', () => location.reload());
+    }
+
+
 
 
     // Attach Main Interaction Listeners
@@ -598,9 +606,16 @@ function showAdminSection(type, btn) {
         btn.classList.add('active');
     }
 
+    // Ensure Admin Panel is visible and others are hidden
+    if (adminPanel) adminPanel.style.display = 'block';
+    if (heroSection) heroSection.style.display = 'none';
+    if (songListSection) songListSection.style.display = 'none';
+    if (profileSection) profileSection.style.display = 'none';
+
     adminMusicTable.style.display = 'none';
     adminUserTable.style.display = 'none';
     adminLogsTable.style.display = 'none';
+
 
     // Update real stats on refresh
     if (statTotalSongs) statTotalSongs.textContent = songs.length;
