@@ -1,31 +1,36 @@
-# Vibraze - Premium Music Player
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Vibraze là một ứng dụng nghe nhạc trực tuyến được thiết kế với giao diện hiện đại, tối giản và hiệu ứng Glassmorphism bắt mắt.
+## Getting Started
 
-## ✨ Tính năng nổi bật
-- **Trình phát nhạc đầy đủ**: Phát, tạm dừng, chuyển bài, quay lại.
-- **Chế độ phát**: Hỗ trợ Shuffle (ngẫu nhiên) và Repeat (lặp lại).
-- **Giao diện Responsive**: Tối ưu cho cả Desktop và Mobile.
-- **Tìm kiếm thông minh**: Tìm kiếm bài hát và nghệ sĩ theo thời gian thực.
-- **Lời chào theo thời gian**: Tự động thay đổi lời chào dựa trên giờ thực tế.
-- **Đĩa nhạc xoay**: Hiệu ứng rotation cực đẹp trong chế độ xem chi tiết.
-- **Âm lượng & Tiến độ**: Thanh điều khiển mượt mà.
+First, run the development server:
 
-## 🚀 Công nghệ sử dụng
-- **HTML5 & CSS3**: Cấu trúc và phong cách hiện đại.
-- **Vanilla JavaScript**: Logic xử lý nhạc và tương tác DOM.
-- **FontAwesome**: Hệ thống icon đồng nhất.
-- **Google Fonts**: Plus Jakarta Sans & Inter.
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## 🛠️ Triển khai (Deployment)
-Dự án có thể dễ dàng triển khai lên các nền tảng:
-1. **Vercel**: Chỉ cần kéo thả thư mục hoặc kết nối GitHub.
-2. **Railway**: Phù hợp nếu bạn muốn thêm backend sau này.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 📦 Lưu trữ dữ liệu (Database)
-Nếu bạn muốn lưu trữ playlist người dùng:
-- **MongoDB Atlas**: Cơ sở dữ liệu NoSQL mạnh mẽ.
-- **Upstash**: Redis database cực nhanh cho caching dashboard hoặc session.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
----
-Phát triển bởi **Antigravity**
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
