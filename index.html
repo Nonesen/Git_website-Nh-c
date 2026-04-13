@@ -124,28 +124,30 @@
                 <!-- Login Bar (Guest) -->
                 <div id="header-guest" class="header-guest" style="display: flex;">
                     <button id="header-login-btn" class="btn-login-header" data-i18n="header-login">Đăng nhập</button>
-                    <div class="header-settings" id="settings-trigger">
-                        <i class="fa-solid fa-gear"></i>
-                        <div class="settings-dropdown" id="settings-dropdown">
-                            <div class="settings-menu-main" id="settings-menu-main">
-                                <div class="settings-menu-item" id="lang-menu-btn">
-                                    <div class="item-left"><i class="fa-solid fa-language"></i> <span data-i18n="settings-lang">Ngôn ngữ</span></div>
-                                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                                </div>
-                                <div class="settings-menu-item">
-                                    <div class="item-left"><i class="fa-regular fa-comment-dots"></i> <span data-i18n="settings-feedback">Góp ý</span></div>
-                                </div>
+                </div>
+
+                <!-- Global Toggleable Settings Icon -->
+                <div class="header-settings" id="settings-trigger">
+                    <i class="fa-solid fa-gear"></i>
+                    <div class="settings-dropdown" id="settings-dropdown">
+                        <div class="settings-menu-main" id="settings-menu-main">
+                            <div class="settings-menu-item" id="lang-menu-btn">
+                                <div class="item-left"><i class="fa-solid fa-language"></i> <span data-i18n="settings-lang">Ngôn ngữ</span></div>
+                                <i class="fa-solid fa-chevron-right arrow-icon"></i>
                             </div>
-                            <div class="settings-menu-lang" id="settings-menu-lang" style="display: none;">
-                                <div class="submenu-header" id="lang-back-btn">
-                                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="settings-back">Quay lại</span>
-                                </div>
-                                <div class="lang-option active" data-lang="vi">
-                                    Tiếng Việt <i class="fa-solid fa-check check-icon"></i>
-                                </div>
-                                <div class="lang-option" data-lang="en">
-                                    English <i class="fa-solid fa-check check-icon" style="display: none;"></i>
-                                </div>
+                            <div class="settings-menu-item">
+                                <div class="item-left"><i class="fa-regular fa-comment-dots"></i> <span data-i18n="settings-feedback">Góp ý</span></div>
+                            </div>
+                        </div>
+                        <div class="settings-menu-lang" id="settings-menu-lang" style="display: none;">
+                            <div class="submenu-header" id="lang-back-btn">
+                                <i class="fa-solid fa-arrow-left"></i> <span data-i18n="settings-back">Quay lại</span>
+                            </div>
+                            <div class="lang-option active" data-lang="vi">
+                                Tiếng Việt <i class="fa-solid fa-check check-icon"></i>
+                            </div>
+                            <div class="lang-option" data-lang="en">
+                                English <i class="fa-solid fa-check check-icon" style="display: none;"></i>
                             </div>
                         </div>
                     </div>
@@ -388,6 +390,7 @@
     </div>
 
     <!-- Script -->
-    <script src="style/script.js"></script>
+    <!-- Modular Script -->
+    <script type="module" src="src/app.js"></script>
 </body>
 </html>
