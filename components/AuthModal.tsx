@@ -53,7 +53,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                             <div className="form-group password-group">
                                 <input 
                                     type="password" 
-                                    placeholder="Nhập mật khẩu (123)" 
+                                    placeholder="Nhập mật khẩu (admin123 hoặc user123)" 
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
@@ -94,8 +94,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 )}
 
                 <div className="demo-creds">
-                    <p>Demo Admin: <strong>admin</strong> / <strong>123</strong></p>
-                    <p>Demo User: <strong>user</strong> / <strong>123</strong></p>
+                    <p>Demo Admin: <strong>admin</strong> / <strong>admin123</strong></p>
+                    <p>Demo User: <strong>user</strong> / <strong>user123</strong></p>
                 </div>
             </div>
         </div>

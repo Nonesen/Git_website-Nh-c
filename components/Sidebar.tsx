@@ -28,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     return (
         <aside className="sidebar">
             <div className="logo" onClick={() => onTabChange('home')} style={{ cursor: 'pointer' }}>
-                <i className="fa-solid fa-music"></i>
+                <i className="fa-solid fa-bolt-lightning"></i>
                 <span>Vibraze</span>
             </div>
             
