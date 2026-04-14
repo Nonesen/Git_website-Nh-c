@@ -27,5 +27,4 @@ Nếu bạn muốn lưu trữ playlist người dùng:
 - **MongoDB Atlas**: Cơ sở dữ liệu NoSQL mạnh mẽ.
 - **Upstash**: Redis database cực nhanh cho caching dashboard hoặc session.
 
----
-Phát triển bởi **Antigravity**
+

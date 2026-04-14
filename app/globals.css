@@ -738,13 +738,13 @@ h1, h2, h3, .logo span {
 }
 
 .auth-card {
-    background: #1a1f2e;
-    border: 1px solid rgba(99, 102, 241, 0.25);
+    background: var(--bg-sidebar);
+    border: 1px solid var(--glass-border);
     padding: 2.5rem;
     border-radius: 20px;
     width: 100%;
     max-width: 420px;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--glass-border);
     position: relative;
 }
 
@@ -786,8 +786,8 @@ h1, h2, h3, .logo span {
 .form-group input {
     width: 100%;
     padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
     border-radius: 10px;
     color: var(--text-main);
     font-size: 0.9rem;
@@ -861,8 +861,8 @@ h1, h2, h3, .logo span {
 .demo-creds {
     margin-top: 1.5rem;
     padding: 12px 16px;
-    background: rgba(99, 102, 241, 0.08);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
     border-radius: 10px;
     font-size: 0.8rem;
     color: var(--text-muted);
