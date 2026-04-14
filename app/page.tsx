@@ -8,6 +8,7 @@ import SongGrid from '@/components/SongGrid';
 import AuthModal from '@/components/AuthModal';
 import AdminPanel from '@/components/AdminPanel';
 import Profile from '@/components/Profile';
+import FeedbackModal from '@/components/FeedbackModal';
 import { useLanguage } from '@/context/LanguageContext';
 import { usePlayer } from '@/context/PlayerContext';
 
@@ -18,6 +19,7 @@ export default function Home() {
   const { likedSongs } = usePlayer();
   const [activeTab, setActiveTab] = useState('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
   const [displaySongs, setDisplaySongs] = useState<Song[]>(songs);
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,6 +68,7 @@ export default function Home() {
         <Header 
           setActiveTab={setActiveTab} 
           onLoginClick={() => setIsAuthModalOpen(true)}
+          onFeedbackClick={() => setIsFeedbackModalOpen(true)}
           onSearch={(query) => setSearchQuery(query)}
         />
 
@@ -104,6 +107,11 @@ export default function Home() {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
+      />
+
+      <FeedbackModal 
+        isOpen={isFeedbackModalOpen} 
+        onClose={() => setIsFeedbackModalOpen(false)} 
       />
     </div>
   );

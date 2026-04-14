@@ -9,10 +9,11 @@ import RealTimeClock from './RealTimeClock';
 interface HeaderProps {
     setActiveTab: (tab: string) => void;
     onLoginClick: () => void;
+    onFeedbackClick: () => void;
     onSearch: (query: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick, onSearch }) => {
+const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick, onFeedbackClick, onSearch }) => {
     const { t, language, setLanguage } = useLanguage();
     const { user, logout } = useAuth();
     const { theme, setTheme } = useTheme();
@@ -134,7 +135,7 @@ const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick, onSearch })
                                             </div>
                                             <i className="fa-solid fa-chevron-right arrow-icon"></i>
                                         </div>
-                                        <div className="settings-menu-item">
+                                        <div className="settings-menu-item" onClick={() => { onFeedbackClick(); setIsSettingsOpen(false); }}>
                                             <div className="item-left">
                                                 <i className="fa-regular fa-comment-dots"></i>
                                                 <span>{t('settings-feedback')}</span>
