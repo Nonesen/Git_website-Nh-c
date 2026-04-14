@@ -52,25 +52,11 @@
 | `admin` | `admin123` | Admin (toàn quyền) |
 | `user` | `user123` | Người dùng |
 
----
+## 🌐 Trải Nghiệm Trực Tuyến
 
-## 💻 Chạy local (tùy chọn)
+Ứng dụng hiện tại đã được loại bỏ hoàn toàn sự phụ thuộc vào môi trường máy chủ cục bộ (localhost). Bạn không cần phải tải code về hay chạy bất kỳ câu lệnh `npm run dev` nào. 
 
-```bash
-# Clone repo
-git clone https://github.com/Nonesen/Git_website-Nh-c.git
-cd Git_website-Nh-c/Vibraze
-
-# Cài đặt
-npm install
-
-# Chạy dev server
-npm run dev
-```
-
-Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
-
-> **Lưu ý:** Bạn **không cần** chạy local để dùng ứng dụng — chỉ cần mở link Vercel bên trên là đủ!
+Chỉ cần truy cập vào đường link Vercel ở trên là bạn đã có thể trải nghiệm toàn bộ tính năng với dữ liệu được mô phỏng sẵn ngay trên trình duyệt của bạn (dữ liệu được lưu an toàn trong localStorage).
 
 ---
 
