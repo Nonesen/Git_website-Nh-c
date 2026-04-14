@@ -20,6 +20,7 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
   const [displaySongs, setDisplaySongs] = useState<Song[]>(songs);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Load recently played from localStorage
   useEffect(() => {
@@ -49,6 +50,14 @@ export default function Home() {
 
   const isAdminTab = activeTab.startsWith('admin-');
 
+  // Filter based on search query
+  const finalDisplaySongs = searchQuery.trim() 
+    ? displaySongs.filter(s => 
+        s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        s.artist.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : displaySongs;
+
   return (
     <div className="app-container">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
@@ -57,6 +66,7 @@ export default function Home() {
         <Header 
           setActiveTab={setActiveTab} 
           onLoginClick={() => setIsAuthModalOpen(true)}
+          onSearch={(query) => setSearchQuery(query)}
         />
 
         {activeTab === 'home' && (
@@ -81,10 +91,10 @@ export default function Home() {
                  activeTab === 'explore' ? t('nav-explore') : 
                  activeTab === 'liked' ? t('nav-liked') : t('song-list-title')}
               </h2>
-              <span>{displaySongs.length} {t('song-count')}</span>
+              <span>{finalDisplaySongs.length} {t('song-count')}</span>
             </div>
             
-            <SongGrid songs={displaySongs} />
+            <SongGrid songs={finalDisplaySongs} />
           </section>
         )}
       </main>

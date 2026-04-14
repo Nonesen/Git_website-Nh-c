@@ -9,9 +9,10 @@ import RealTimeClock from './RealTimeClock';
 interface HeaderProps {
     setActiveTab: (tab: string) => void;
     onLoginClick: () => void;
+    onSearch: (query: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick }) => {
+const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick, onSearch }) => {
     const { t, language, setLanguage } = useLanguage();
     const { user, logout } = useAuth();
     const { theme, setTheme } = useTheme();
@@ -63,7 +64,11 @@ const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick }) => {
         <header className="top-nav">
             <div className="search-bar">
                 <i className="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder={t('search-placeholder')} />
+                <input 
+                    type="text" 
+                    placeholder={t('search-placeholder')} 
+                    onChange={(e) => onSearch(e.target.value)}
+                />
             </div>
 
             <div className="header-actions">

@@ -45,7 +45,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        audioRef.current = new Audio();
+        if (!audioRef.current) {
+            audioRef.current = new Audio();
+        }
         audioRef.current.volume = volume;
 
         const audio = audioRef.current;
@@ -65,41 +67,49 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         audio.addEventListener('loadedmetadata', updateDuration);
         audio.addEventListener('ended', onEnded);
 
+        // Cleanup to prevent multiple instances or leaky event listeners if we're not careful
         return () => {
             audio.removeEventListener('timeupdate', updateTime);
             audio.removeEventListener('loadedmetadata', updateDuration);
             audio.removeEventListener('ended', onEnded);
-            audio.pause();
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isRepeat, isShuffle, currentSong]); // Re-bind on these changes if needed, but careful with state
+    }, [isRepeat, isShuffle, currentSong]);
 
-    const playSong = (song: Song) => {
+    const playSong = async (song: Song) => {
         if (!audioRef.current) return;
         
-        if (currentSong?.id !== song.id) {
-            setCurrentSong(song);
-            audioRef.current.src = song.src;
-            audioRef.current.load();
+        try {
+            if (currentSong?.id !== song.id || !audioRef.current.src.includes(encodeURI(song.src))) {
+                setCurrentSong(song);
+                audioRef.current.src = song.src;
+                audioRef.current.load();
+                
+                // Track recently played
+                const recent = JSON.parse(localStorage.getItem('vibraze_recent') || '[]');
+                const updated = [song.id, ...recent.filter((id: number) => id !== song.id)].slice(0, 20);
+                localStorage.setItem('vibraze_recent', JSON.stringify(updated));
+            }
             
-            // Track recently played
-            const recent = JSON.parse(localStorage.getItem('vibraze_recent') || '[]');
-            const updated = [song.id, ...recent.filter((id: number) => id !== song.id)].slice(0, 20);
-            localStorage.setItem('vibraze_recent', JSON.stringify(updated));
+            await audioRef.current.play();
+            setIsPlaying(true);
+        } catch (error) {
+            console.warn("Playback interrupted", error);
         }
-        
-        audioRef.current.play();
-        setIsPlaying(true);
     };
 
-    const togglePlay = () => {
+    const togglePlay = async () => {
         if (!audioRef.current) return;
-        if (isPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play();
+        try {
+            if (isPlaying) {
+                audioRef.current.pause();
+                setIsPlaying(false);
+            } else {
+                await audioRef.current.play();
+                setIsPlaying(true);
+            }
+        } catch (error) {
+            console.warn("Toggle playback intercepted", error);
         }
-        setIsPlaying(!isPlaying);
     };
 
     const nextSong = () => {

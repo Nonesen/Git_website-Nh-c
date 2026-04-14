@@ -11,7 +11,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     const { t } = useLanguage();
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
 
     const isAdmin = user?.role === 'admin';
 
@@ -27,8 +27,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
 
     return (
         <aside className="sidebar">
-            <div className="logo" onClick={() => onTabChange('home')} style={{ cursor: 'pointer' }}>
-                <i className="fa-solid fa-bolt-lightning"></i>
+            <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+                <i className="fa-solid fa-music"></i>
                 <span>Vibraze</span>
             </div>
             
@@ -51,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 </ul>
             </nav>
 
-            {!isAdmin && (
+            {(!isAdmin && isAuthenticated) && (
                 <div className="playlists">
                     <h3>{t('playlist-title')}</h3>
                     <ul>
