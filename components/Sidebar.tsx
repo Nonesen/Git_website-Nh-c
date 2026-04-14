@@ -13,7 +13,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     const { t } = useLanguage();
     const { user, isAuthenticated } = useAuth();
-    const { playlists } = usePlayer();
+    const { playlists, deletePlaylist } = usePlayer();
 
     const isAdmin = user?.role === 'admin';
 
@@ -64,8 +64,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                             <span>{t('nav-liked')}</span>
                         </li>
                         {playlists.map(p => (
-                            <li key={p.id} onClick={() => onTabChange(`playlist-${p.id}`)}>
-                                <i className="fa-solid fa-list-ul"></i> {p.name}
+                            <li key={p.id} className="playlist-item-sidebar">
+                                <div className="playlist-info-click" onClick={() => onTabChange(`playlist-${p.id}`)}>
+                                    <i className="fa-solid fa-list-ul"></i>
+                                    <span>{p.name}</span>
+                                </div>
+                                <button 
+                                    className="btn-delete-playlist"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (confirm(`Bạn có chắc muốn xóa playlist "${p.name}"?`)) {
+                                            deletePlaylist(p.id);
+                                        }
+                                    }}
+                                >
+                                    <i className="fa-solid fa-xmark"></i>
+                                </button>
                             </li>
                         ))}
                     </ul>

@@ -8,11 +8,14 @@ const PlayerBar: React.FC = () => {
     const {
         currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
         togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
-        likedSongs, toggleLike, playlists, addToPlaylist
+        likedSongs, toggleLike, playlists, addToPlaylist, createPlaylist, createAndAddToPlaylist,
+        addToNextUp
     } = usePlayer();
 
     const [isQueueOpen, setIsQueueOpen] = useState(false);
-    const [isPlaylistMenuOpen, setIsPlaylistMenuOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [dropdownView, setDropdownView] = useState<'main' | 'playlists'>('main');
+    const [newPlaylistName, setNewPlaylistName] = useState('');
 
     if (!currentSong) return null;
 
@@ -50,26 +53,84 @@ const PlayerBar: React.FC = () => {
                     </button>
                     <div className="playlist-add-container">
                         <button
-                            className="btn-icon secondary"
-                            onClick={() => setIsPlaylistMenuOpen(!isPlaylistMenuOpen)}
-                            title="Thêm vào Album"
+                            className={`btn-icon secondary ${isDropdownOpen ? 'active' : ''}`}
+                            onClick={() => {
+                                setIsDropdownOpen(!isDropdownOpen);
+                                setDropdownView('main');
+                            }}
+                            title="Thêm"
                         >
                             <i className="fa-solid fa-plus"></i>
                         </button>
-                        {isPlaylistMenuOpen && (
-                            <div className="playlist-dropdown">
-                                <h4>Thêm vào Playlist</h4>
-                                <ul>
-                                    {playlists.map(p => (
-                                        <li key={p.id} onClick={() => {
-                                            addToPlaylist(p.id, currentSong.id);
-                                            setIsPlaylistMenuOpen(false);
+                        {isDropdownOpen && (
+                            <div className="action-dropdown">
+                                {dropdownView === 'main' ? (
+                                    <div className="main-dropdown-view">
+                                        <div className="dropdown-item" onClick={() => {
+                                            if (currentSong) addToNextUp(currentSong);
+                                            setIsDropdownOpen(false);
                                         }}>
-                                            <i className="fa-solid fa-list-ul"></i>
-                                            {p.name}
-                                        </li>
-                                    ))}
-                                </ul>
+                                            <i className="fa-solid fa-square-plus"></i>
+                                            <span>Add to Next up</span>
+                                        </div>
+                                        <div className="dropdown-item" onClick={() => setDropdownView('playlists')}>
+                                            <i className="fa-solid fa-list-check"></i>
+                                            <span>Add to Playlist</span>
+                                            <i className="fa-solid fa-chevron-right" style={{ marginLeft: 'auto', fontSize: '0.7rem' }}></i>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="playlists-dropdown-view">
+                                        <div className="dropdown-back" onClick={() => setDropdownView('main')}>
+                                            <i className="fa-solid fa-chevron-left"></i>
+                                            <span>Back</span>
+                                        </div>
+                                        <h4>Add to Album</h4>
+                                        <div className="create-playlist-inline" style={{ marginTop: 0, paddingTop: 0, borderTop: 'none', marginBottom: '10px' }}>
+                                            <input 
+                                                type="text" 
+                                                placeholder="New album..." 
+                                                value={newPlaylistName}
+                                                onChange={(e) => setNewPlaylistName(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && newPlaylistName.trim()) {
+                                                        createAndAddToPlaylist(newPlaylistName.trim(), currentSong.id);
+                                                        setNewPlaylistName('');
+                                                        setIsDropdownOpen(false);
+                                                    }
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                                autoFocus
+                                            />
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (newPlaylistName.trim()) {
+                                                        createAndAddToPlaylist(newPlaylistName.trim(), currentSong.id);
+                                                        setNewPlaylistName('');
+                                                        setIsDropdownOpen(false);
+                                                    }
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        {playlists.length > 0 && (
+                                            <ul>
+                                                {playlists.map(p => (
+                                                    <li key={p.id} onClick={() => {
+                                                        addToPlaylist(p.id, currentSong.id);
+                                                        setIsDropdownOpen(false);
+                                                    }}>
+                                                        <i className="fa-solid fa-list-ul"></i>
+                                                        {p.name}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

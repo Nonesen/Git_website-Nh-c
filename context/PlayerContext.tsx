@@ -26,6 +26,9 @@ interface PlayerContextType {
     deletePlaylist: (id: string) => void;
     addToPlaylist: (playlistId: string, songId: number) => void;
     removeFromPlaylist: (playlistId: string, songId: number) => void;
+    createAndAddToPlaylist: (name: string, songId: number) => void;
+    queue: Song[];
+    addToNextUp: (song: Song) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -40,6 +43,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const [isRepeat, setIsRepeat] = useState(false);
     const [likedSongs, setLikedSongs] = useState<number[]>([]);
     const [playlists, setPlaylists] = useState<{ id: string, name: string, songIds: number[] }[]>([]);
+    const [queue, setQueue] = useState<Song[]>([]);
     
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -51,15 +55,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         
         const savedPlaylists = localStorage.getItem('vibraze_playlists');
         if (savedPlaylists) {
-            setPlaylists(JSON.parse(savedPlaylists));
+            const parsed = JSON.parse(savedPlaylists);
+            // Filter out old defaults p-1 and p-2 if they still exist in storage
+            const filtered = parsed.filter((p: any) => p.id !== 'p-1' && p.id !== 'p-2');
+            setPlaylists(filtered);
+            if (filtered.length !== parsed.length) {
+                localStorage.setItem('vibraze_playlists', JSON.stringify(filtered));
+            }
         } else {
-            // Default playlists based on user's request: Nhạc Chill, Gaming Mix
-            const defaults = [
-                { id: 'p-1', name: 'Nhạc Chill', songIds: [] },
-                { id: 'p-2', name: 'Gaming Mix', songIds: [] }
-            ];
-            setPlaylists(defaults);
-            localStorage.setItem('vibraze_playlists', JSON.stringify(defaults));
+            setPlaylists([]);
+            localStorage.setItem('vibraze_playlists', JSON.stringify([]));
         }
     }, []);
 
@@ -133,6 +138,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const nextSong = () => {
         if (!currentSong) return;
+        
+        if (queue.length > 0) {
+            const nextFromQueue = queue[0];
+            setQueue(prev => prev.slice(1));
+            playSong(nextFromQueue);
+            return;
+        }
+
         let nextIdx;
         if (isShuffle) {
             nextIdx = Math.floor(Math.random() * songs.length);
@@ -182,6 +195,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
     };
 
+    const createAndAddToPlaylist = (name: string, songId: number) => {
+        const newPlaylist = { id: `p-${Date.now()}`, name, songIds: [songId] };
+        const updated = [...playlists, newPlaylist];
+        setPlaylists(updated);
+        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+    };
+
     const deletePlaylist = (id: string) => {
         const updated = playlists.filter(p => p.id !== id);
         setPlaylists(updated);
@@ -210,12 +230,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
     };
 
+    const addToNextUp = (song: Song) => {
+        setQueue(prev => [song, ...prev]);
+    };
+
     return (
         <PlayerContext.Provider value={{
             currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
             playSong, togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
             likedSongs, toggleLike,
-            playlists, createPlaylist, deletePlaylist, addToPlaylist, removeFromPlaylist
+            playlists, createPlaylist, deletePlaylist, addToPlaylist, removeFromPlaylist, createAndAddToPlaylist,
+            queue, addToNextUp
         }}>
             {children}
         </PlayerContext.Provider>
