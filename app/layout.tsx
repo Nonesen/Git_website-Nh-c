@@ -31,8 +31,14 @@ export default function RootLayout({
     <html lang="vi" suppressHydrationWarning>
       <head>
         <link 
+          rel="preconnect"
+          href="https://ka-f.fontawesome.com"
+          crossOrigin="anonymous"
+        />
+        <link 
           rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossOrigin="anonymous"
         />
       </head>
       <body className={`${inter.variable} ${plusJakarta.variable}`}>
