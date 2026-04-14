@@ -21,6 +21,11 @@ interface PlayerContextType {
     toggleRepeat: () => void;
     likedSongs: number[];
     toggleLike: (songId: number) => void;
+    playlists: { id: string, name: string, songIds: number[] }[];
+    createPlaylist: (name: string) => void;
+    deletePlaylist: (id: string) => void;
+    addToPlaylist: (playlistId: string, songId: number) => void;
+    removeFromPlaylist: (playlistId: string, songId: number) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -34,6 +39,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const [isShuffle, setIsShuffle] = useState(false);
     const [isRepeat, setIsRepeat] = useState(false);
     const [likedSongs, setLikedSongs] = useState<number[]>([]);
+    const [playlists, setPlaylists] = useState<{ id: string, name: string, songIds: number[] }[]>([]);
     
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -41,6 +47,19 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const savedLikes = localStorage.getItem('vibraze_likes');
         if (savedLikes) {
             setLikedSongs(JSON.parse(savedLikes));
+        }
+        
+        const savedPlaylists = localStorage.getItem('vibraze_playlists');
+        if (savedPlaylists) {
+            setPlaylists(JSON.parse(savedPlaylists));
+        } else {
+            // Default playlists based on user's request: Nhạc Chill, Gaming Mix
+            const defaults = [
+                { id: 'p-1', name: 'Nhạc Chill', songIds: [] },
+                { id: 'p-2', name: 'Gaming Mix', songIds: [] }
+            ];
+            setPlaylists(defaults);
+            localStorage.setItem('vibraze_playlists', JSON.stringify(defaults));
         }
     }, []);
 
@@ -146,22 +165,47 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const toggleShuffle = () => setIsShuffle(!isShuffle);
     const toggleRepeat = () => setIsRepeat(!isRepeat);
 
-    const toggleLike = (songId: number) => {
-        setLikedSongs(prev => {
-            const isLiked = prev.includes(songId);
-            const newLikes = isLiked ? prev.filter(id => id !== songId) : [...prev, songId];
-            localStorage.setItem('vibraze_likes', JSON.stringify(newLikes));
-            // Dispatch a custom event so other components can know to refresh if needed
-            window.dispatchEvent(new Event('vibraze_likes_updated'));
-            return newLikes;
+    const createPlaylist = (name: string) => {
+        const newPlaylist = { id: `p-${Date.now()}`, name, songIds: [] };
+        const updated = [...playlists, newPlaylist];
+        setPlaylists(updated);
+        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+    };
+
+    const deletePlaylist = (id: string) => {
+        const updated = playlists.filter(p => p.id !== id);
+        setPlaylists(updated);
+        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+    };
+
+    const addToPlaylist = (playlistId: string, songId: number) => {
+        const updated = playlists.map(p => {
+            if (p.id === playlistId && !p.songIds.includes(songId)) {
+                return { ...p, songIds: [...p.songIds, songId] };
+            }
+            return p;
         });
+        setPlaylists(updated);
+        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+    };
+
+    const removeFromPlaylist = (playlistId: string, songId: number) => {
+        const updated = playlists.map(p => {
+            if (p.id === playlistId) {
+                return { ...p, songIds: p.songIds.filter(id => id !== songId) };
+            }
+            return p;
+        });
+        setPlaylists(updated);
+        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
     };
 
     return (
         <PlayerContext.Provider value={{
             currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
             playSong, togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
-            likedSongs, toggleLike
+            likedSongs, toggleLike,
+            playlists, createPlaylist, deletePlaylist, addToPlaylist, removeFromPlaylist
         }}>
             {children}
         </PlayerContext.Provider>

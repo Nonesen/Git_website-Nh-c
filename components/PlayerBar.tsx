@@ -8,10 +8,11 @@ const PlayerBar: React.FC = () => {
     const {
         currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
         togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
-        likedSongs, toggleLike
+        likedSongs, toggleLike, playlists, addToPlaylist
     } = usePlayer();
 
     const [isQueueOpen, setIsQueueOpen] = useState(false);
+    const [isPlaylistMenuOpen, setIsPlaylistMenuOpen] = useState(false);
 
     if (!currentSong) return null;
 
@@ -37,15 +38,42 @@ const PlayerBar: React.FC = () => {
                     <h4>{currentSong.title}</h4>
                     <p>{currentSong.artist}</p>
                 </div>
-                <button
-                    className={`btn-icon like-btn ${isLiked ? 'active' : ''}`}
-                    onClick={() => toggleLike(currentSong.id)}
-                    title={isLiked ? 'Bỏ thích' : 'Thêm vào yêu thích'}
-                >
-                    <i className={`${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart`}
-                        style={{ color: isLiked ? '#f43f5e' : '' }}
-                    ></i>
-                </button>
+                <div className="track-actions">
+                    <button
+                        className={`btn-icon like-btn ${isLiked ? 'active' : ''}`}
+                        onClick={() => toggleLike(currentSong.id)}
+                        title={isLiked ? 'Bỏ thích' : 'Thêm vào yêu thích'}
+                    >
+                        <i className={`${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart`}
+                            style={{ color: isLiked ? '#f43f5e' : '' }}
+                        ></i>
+                    </button>
+                    <div className="playlist-add-container">
+                        <button
+                            className="btn-icon secondary"
+                            onClick={() => setIsPlaylistMenuOpen(!isPlaylistMenuOpen)}
+                            title="Thêm vào Album"
+                        >
+                            <i className="fa-solid fa-plus"></i>
+                        </button>
+                        {isPlaylistMenuOpen && (
+                            <div className="playlist-dropdown">
+                                <h4>Thêm vào Playlist</h4>
+                                <ul>
+                                    {playlists.map(p => (
+                                        <li key={p.id} onClick={() => {
+                                            addToPlaylist(p.id, currentSong.id);
+                                            setIsPlaylistMenuOpen(false);
+                                        }}>
+                                            <i className="fa-solid fa-list-ul"></i>
+                                            {p.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* CENTER — Controls */}

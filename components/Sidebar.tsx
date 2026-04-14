@@ -3,6 +3,7 @@
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
+import { usePlayer } from '@/context/PlayerContext';
 
 interface SidebarProps {
     activeTab: string;
@@ -12,6 +13,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     const { t } = useLanguage();
     const { user, isAuthenticated } = useAuth();
+    const { playlists } = usePlayer();
 
     const isAdmin = user?.role === 'admin';
 
@@ -36,7 +38,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 <ul>
                     {navItems.map(item => {
                         if (item.adminOnly && !isAdmin) return null;
-                        // Always show for guests now
                         return (
                             <li 
                                 key={item.id}
@@ -62,8 +63,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                             <i className="fa-solid fa-heart"></i>
                             <span>{t('nav-liked')}</span>
                         </li>
-                        <li><i className="fa-solid fa-list-ul"></i> Nhạc Chill</li>
-                        <li><i className="fa-solid fa-list-ul"></i> Gaming Mix</li>
+                        {playlists.map(p => (
+                            <li key={p.id} onClick={() => onTabChange(`playlist-${p.id}`)}>
+                                <i className="fa-solid fa-list-ul"></i> {p.name}
+                            </li>
+                        ))}
                     </ul>
                 </div>
             )}
