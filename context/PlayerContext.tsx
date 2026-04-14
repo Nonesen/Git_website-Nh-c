@@ -165,6 +165,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const toggleShuffle = () => setIsShuffle(!isShuffle);
     const toggleRepeat = () => setIsRepeat(!isRepeat);
 
+    const toggleLike = (songId: number) => {
+        setLikedSongs(prev => {
+            const isLiked = prev.includes(songId);
+            const newLikes = isLiked ? prev.filter(id => id !== songId) : [...prev, songId];
+            localStorage.setItem('vibraze_likes', JSON.stringify(newLikes));
+            window.dispatchEvent(new Event('vibraze_likes_updated'));
+            return newLikes;
+        });
+    };
+
     const createPlaylist = (name: string) => {
         const newPlaylist = { id: `p-${Date.now()}`, name, songIds: [] };
         const updated = [...playlists, newPlaylist];
