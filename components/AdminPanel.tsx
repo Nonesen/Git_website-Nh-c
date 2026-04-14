@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+import React from 'react';
+
 import { useAuth } from '@/context/AuthContext';
 import { songs, initialUsers } from '@/data/constants';
 
@@ -10,7 +10,6 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
-    const { t } = useLanguage();
     const { user } = useAuth();
     
     if (user?.role !== 'admin') return <div className="content">Access Denied</div>;

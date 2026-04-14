@@ -9,12 +9,13 @@ import AuthModal from '@/components/AuthModal';
 import AdminPanel from '@/components/AdminPanel';
 import Profile from '@/components/Profile';
 import { useLanguage } from '@/context/LanguageContext';
-import { useAuth } from '@/context/AuthContext';
+import { usePlayer } from '@/context/PlayerContext';
+
 import { songs, Song } from '@/data/constants';
 
 export default function Home() {
   const { t } = useLanguage();
-  const { user } = useAuth();
+  const { likedSongs } = usePlayer();
   const [activeTab, setActiveTab] = useState('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
@@ -26,6 +27,7 @@ export default function Home() {
     if (saved) {
       const recentIds = JSON.parse(saved);
       const filtered = recentIds.map((id: number) => songs.find(s => s.id === id)).filter(Boolean);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRecentSongs(filtered);
     }
   }, [activeTab]); // Refresh when switching tabs
@@ -33,20 +35,19 @@ export default function Home() {
   // Update displayed songs based on active tab
   useEffect(() => {
     if (activeTab === 'home') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplaySongs(songs);
     } else if (activeTab === 'explore') {
       setDisplaySongs([...songs].sort(() => Math.random() - 0.5));
     } else if (activeTab === 'recent') {
       setDisplaySongs(recentSongs);
     } else if (activeTab === 'liked') {
-      const likedIds = JSON.parse(localStorage.getItem('vibraze_likes') || '[]');
-      const filtered = likedIds.map((id: number) => songs.find(s => s.id === id)).filter(Boolean);
+      const filtered = likedSongs.map((id: number) => songs.find(s => s.id === id)).filter(Boolean) as Song[];
       setDisplaySongs(filtered);
     }
-  }, [activeTab, recentSongs]);
+  }, [activeTab, recentSongs, likedSongs]);
 
   const isAdminTab = activeTab.startsWith('admin-');
-  const isProfileTab = activeTab === 'profile' || activeTab === 'nav-profile-btn'; // Handle profile btn click
 
   return (
     <div className="app-container">
@@ -68,7 +69,7 @@ export default function Home() {
         )}
 
         {isAdminTab ? (
-          <AdminPanel view={activeTab.split('-')[1] as any} />
+          <AdminPanel view={activeTab.split('-')[1] as 'music' | 'users' | 'stats'} />
         ) : activeTab === 'profile' ? (
           <Profile />
         ) : (

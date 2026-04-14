@@ -19,6 +19,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const savedLang = localStorage.getItem('vibraze_lang') as Language;
         if (savedLang && (savedLang === 'vi' || savedLang === 'en')) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLanguageState(savedLang);
         }
     }, []);
@@ -29,7 +30,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     const t = (key: string): string => {
-        return (translations[language] as any)[key] || key;
+        return (translations[language] as Record<string, string>)[key] || key;
     };
 
     return (

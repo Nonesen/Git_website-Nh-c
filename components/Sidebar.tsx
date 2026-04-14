@@ -14,7 +14,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     const { user } = useAuth();
 
     const isAdmin = user?.role === 'admin';
-    const isUser = !!user;
 
     const navItems = [
         { id: 'home', icon: 'fa-house', label: 'nav-home', userOnly: false, adminOnly: false },
@@ -28,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
 
     return (
         <aside className="sidebar">
-            <div className="logo">
+            <div className="logo" onClick={() => onTabChange('home')} style={{ cursor: 'pointer' }}>
                 <i className="fa-solid fa-music"></i>
                 <span>Vibraze</span>
             </div>
@@ -37,8 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 <ul>
                     {navItems.map(item => {
                         if (item.adminOnly && !isAdmin) return null;
-                        if (item.userOnly && !isUser) return null;
-
+                        // Always show for guests now
                         return (
                             <li 
                                 key={item.id}
@@ -53,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                 </ul>
             </nav>
 
-            {isUser && !isAdmin && (
+            {!isAdmin && (
                 <div className="playlists">
                     <h3>{t('playlist-title')}</h3>
                     <ul>

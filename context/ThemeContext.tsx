@@ -17,6 +17,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const savedTheme = localStorage.getItem('vibraze_theme') as Theme;
         if (savedTheme) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setThemeState(savedTheme);
         } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
             setThemeState('system');

@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎵 Vibraze — Premium Music Experience
 
-## Getting Started
+<div align="center">
+  <img src="https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript" />
+  <img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel" />
+</div>
 
-First, run the development server:
+<br/>
+
+> Ứng dụng nghe nhạc trực tuyến cao cấp, được xây dựng với thiết kế glassmorphism và trải nghiệm người dùng hiện đại — không cần cài đặt, không cần local server.
+
+## 🔗 Live Demo
+
+**[▶ Mở Vibraze trực tuyến](https://git-website-nh-c.vercel.app)**
+
+---
+
+## ✨ Tính năng nổi bật
+
+| Tính năng | Mô tả |
+|---|---|
+| 🎵 **Music Player** | Phát nhạc đầy đủ tính năng: play/pause, skip, shuffle, repeat |
+| 🌈 **Dynamic Background** | Nền web tự động đổi màu theo bìa album đang phát (như Apple Music) |
+| ❤️ **Persistent Favorites** | Lưu bài hát yêu thích bền vào localStorage |
+| 📋 **Queue Panel** | Xem hàng chờ bài hát, click để phát bất kỳ bài nào |
+| 🌐 **Đa ngôn ngữ** | Hỗ trợ Tiếng Việt & English |
+| 🌙 **Dark / Light Mode** | Chuyển đổi chủ đề sáng/tối mượt mà |
+| 👤 **Hệ thống tài khoản** | Đăng nhập user/admin, session được ghi nhớ |
+| 🔐 **Admin Panel** | Quản lý nhạc, người dùng và xem thống kê (dành cho admin) |
+| 📊 **Lịch sử nghe** | Ghi nhớ bài đã nghe gần đây |
+| 📱 **Responsive** | Giao diện tương thích mọi màn hình |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js 16](https://nextjs.org/) + App Router
+- **UI:** React 19 + TypeScript 5 + Vanilla CSS
+- **State:** React Context API (Player, Auth, Theme, Language)
+- **Fonts:** Inter + Plus Jakarta Sans (Google Fonts)
+- **Icons:** Font Awesome 6
+- **Deployment:** [Vercel](https://vercel.com) — auto-deploy on every push to `main`
+
+---
+
+## 🚀 Tài khoản Demo
+
+| Username | Password | Vai trò |
+|---|---|---|
+| `admin` | `admin123` | Admin (toàn quyền) |
+| `user` | `user123` | Người dùng |
+
+---
+
+## 💻 Chạy local (tùy chọn)
 
 ```bash
+# Clone repo
+git clone https://github.com/Nonesen/Git_website-Nh-c.git
+cd Git_website-Nh-c/Vibraze
+
+# Cài đặt
+npm install
+
+# Chạy dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> **Lưu ý:** Bạn **không cần** chạy local để dùng ứng dụng — chỉ cần mở link Vercel bên trên là đủ!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📁 Cấu trúc dự án
 
-To learn more about Next.js, take a look at the following resources:
+```
+Vibraze/
+├── app/
+│   ├── layout.tsx       # Root layout + Providers
+│   ├── page.tsx         # Main page
+│   └── globals.css      # Global styles
+├── components/
+│   ├── Header.tsx       # Thanh điều hướng + Settings
+│   ├── Sidebar.tsx      # Menu điều hướng trái
+│   ├── PlayerBar.tsx    # Thanh phát nhạc phía dưới
+│   ├── QueuePanel.tsx   # Panel hàng chờ bài hát
+│   ├── Background.tsx   # Dynamic background theo album
+│   ├── SongCard.tsx     # Card từng bài hát
+│   ├── SongGrid.tsx     # Grid danh sách nhạc
+│   ├── Profile.tsx      # Trang hồ sơ người dùng
+│   ├── AdminPanel.tsx   # Bảng quản trị
+│   └── AuthModal.tsx    # Modal đăng nhập
+├── context/
+│   ├── PlayerContext.tsx   # State phát nhạc + Likes
+│   ├── AuthContext.tsx     # State xác thực
+│   ├── ThemeContext.tsx    # State giao diện
+│   └── LanguageContext.tsx # State ngôn ngữ
+└── data/
+    └── constants.ts     # Dữ liệu bài hát + bản dịch
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔄 Deployment
 
-## Deploy on Vercel
+Dự án được tự động deploy lên **Vercel** mỗi khi có push lên nhánh `main`.  
+Không cần thao tác thủ công — commit & push là website cập nhật ngay.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+main branch → Vercel auto-build → Live in ~30s
+```

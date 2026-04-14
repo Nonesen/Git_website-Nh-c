@@ -2,17 +2,16 @@
 
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { useLanguage } from '@/context/LanguageContext';
 
 const Profile: React.FC = () => {
     const { user } = useAuth();
-    const { t } = useLanguage();
 
     if (!user) return <div className="empty-state">Vui lòng đăng nhập</div>;
 
     return (
         <section id="profile-section" className="profile-section">
             <div className="profile-header">
+                <div className="profile-banner"></div>
                 <div className="profile-info-main">
                     <div className="profile-avatar-container">
                         <img 

@@ -36,42 +36,45 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button className="auth-close-btn" onClick={onClose}>&times;</button>
                 
                 {view === 'login' ? (
-                    <form onSubmit={handleLogin}>
+                    <div id="login-form">
                         <div className="auth-header">
                             <h2>{t('header-login')}</h2>
                         </div>
                         {error && <p style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</p>}
-                        <div className="form-group">
-                            <input 
-                                type="text" 
-                                placeholder="Nhập username của bạn (user/admin)" 
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </div>
-                        <div className="form-group password-group">
-                            <input 
-                                type="password" 
-                                placeholder="Nhập mật khẩu (123)" 
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                        
-                        <div className="auth-options">
-                            <label className="custom-checkbox">
-                                <input type="checkbox" />
-                                <span className="checkmark"></span>
-                                Nhớ cho lần đăng nhập tới
-                            </label>
-                            <a href="#" className="forgot-link">Quên mật khẩu?</a>
-                        </div>
+                        <form onSubmit={handleLogin}>
+                            <div className="form-group">
+                                <input 
+                                    type="text" 
+                                    placeholder="Nhập username của bạn (user/admin)" 
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group password-group">
+                                <input 
+                                    type="password" 
+                                    placeholder="Nhập mật khẩu (123)" 
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <i className="fa-regular fa-eye-slash toggle-password"></i>
+                            </div>
+                            
+                            <div className="auth-options">
+                                <label className="custom-checkbox">
+                                    <input type="checkbox" />
+                                    <span className="checkmark"></span>
+                                    Nhớ cho lần đăng nhập tới
+                                </label>
+                                <a href="#" className="forgot-link">Quên mật khẩu?</a>
+                            </div>
 
-                        <button type="submit" className="btn-auth-submit">Đăng nhập</button>
-                        <p className="auth-switch">Chưa có tài khoản? <span onClick={() => setView('signup')}>Đăng ký ngay</span></p>
-                    </form>
+                            <button type="submit" className="btn-auth-submit">Đăng nhập</button>
+                            <p className="auth-switch">Chưa có tài khoản? <span onClick={() => setView('signup')}>Đăng ký ngay</span></p>
+                        </form>
+                    </div>
                 ) : (
-                    <div>
+                    <div id="signup-form">
                         <div className="auth-header">
                             <h2>Đăng ký tài khoản</h2>
                         </div>
@@ -83,6 +86,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         </div>
                         <div className="form-group password-group">
                             <input type="password" placeholder="Mật khẩu của bạn" />
+                            <i className="fa-regular fa-eye-slash toggle-password"></i>
                         </div>
                         <button className="btn-auth-submit">Đăng ký</button>
                         <p className="auth-switch">Đã có tài khoản? <span onClick={() => setView('login')}>Đăng nhập</span></p>

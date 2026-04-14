@@ -19,6 +19,8 @@ interface PlayerContextType {
     setVolume: (volume: number) => void;
     toggleShuffle: () => void;
     toggleRepeat: () => void;
+    likedSongs: number[];
+    toggleLike: (songId: number) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -31,8 +33,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const [volume, setVolumeState] = useState(0.8);
     const [isShuffle, setIsShuffle] = useState(false);
     const [isRepeat, setIsRepeat] = useState(false);
+    const [likedSongs, setLikedSongs] = useState<number[]>([]);
     
     const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        const savedLikes = localStorage.getItem('vibraze_likes');
+        if (savedLikes) {
+            setLikedSongs(JSON.parse(savedLikes));
+        }
+    }, []);
 
     useEffect(() => {
         audioRef.current = new Audio();
@@ -61,6 +71,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             audio.removeEventListener('ended', onEnded);
             audio.pause();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRepeat, isShuffle, currentSong]); // Re-bind on these changes if needed, but careful with state
 
     const playSong = (song: Song) => {
@@ -125,10 +136,22 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const toggleShuffle = () => setIsShuffle(!isShuffle);
     const toggleRepeat = () => setIsRepeat(!isRepeat);
 
+    const toggleLike = (songId: number) => {
+        setLikedSongs(prev => {
+            const isLiked = prev.includes(songId);
+            const newLikes = isLiked ? prev.filter(id => id !== songId) : [...prev, songId];
+            localStorage.setItem('vibraze_likes', JSON.stringify(newLikes));
+            // Dispatch a custom event so other components can know to refresh if needed
+            window.dispatchEvent(new Event('vibraze_likes_updated'));
+            return newLikes;
+        });
+    };
+
     return (
         <PlayerContext.Provider value={{
             currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
-            playSong, togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat
+            playSong, togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
+            likedSongs, toggleLike
         }}>
             {children}
         </PlayerContext.Provider>

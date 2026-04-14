@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { PlayerProvider } from "@/context/PlayerContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import Background from "@/components/Background";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
           <LanguageProvider>
             <ThemeProvider>
               <PlayerProvider>
+                <Background />
                 {children}
               </PlayerProvider>
             </ThemeProvider>

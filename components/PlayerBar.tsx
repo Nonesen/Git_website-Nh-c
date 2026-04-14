@@ -2,12 +2,16 @@
 
 import React, { useState } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
+import QueuePanel from './QueuePanel';
 
 const PlayerBar: React.FC = () => {
     const { 
         currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
-        togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat
+        togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
+        likedSongs, toggleLike
     } = usePlayer();
+    
+    const [isQueueOpen, setIsQueueOpen] = useState(false);
 
     if (!currentSong) return null;
 
@@ -35,7 +39,12 @@ const PlayerBar: React.FC = () => {
                     <h4>{currentSong.title}</h4>
                     <p>{currentSong.artist}</p>
                 </div>
-                <button className="btn-icon like-btn"><i className="fa-regular fa-heart"></i></button>
+                <button 
+                    className={`btn-icon like-btn ${likedSongs.includes(currentSong.id) ? 'active' : ''}`}
+                    onClick={() => toggleLike(currentSong.id)}
+                >
+                    <i className={likedSongs.includes(currentSong.id) ? "fa-solid fa-heart" : "fa-regular fa-heart"} style={{ color: likedSongs.includes(currentSong.id) ? '#6366f1' : '' }}></i>
+                </button>
             </div>
 
             <div className="player-controls">
@@ -80,7 +89,12 @@ const PlayerBar: React.FC = () => {
             </div>
 
             <div className="extra-controls">
-                <button className="btn-icon secondary"><i className="fa-solid fa-list"></i></button>
+                <button 
+                    className={`btn-icon secondary ${isQueueOpen ? 'active' : ''}`} 
+                    onClick={() => setIsQueueOpen(!isQueueOpen)}
+                >
+                    <i className="fa-solid fa-list"></i>
+                </button>
                 <div className="volume-control">
                     <i className="fa-solid fa-volume-high"></i>
                     <input 
@@ -93,6 +107,8 @@ const PlayerBar: React.FC = () => {
                     />
                 </div>
             </div>
+            
+            <QueuePanel isOpen={isQueueOpen} onClose={() => setIsQueueOpen(false)} />
         </footer>
     );
 };

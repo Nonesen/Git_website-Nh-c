@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const savedSession = sessionStorage.getItem('vibraze_session');
         if (savedSession) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setUser(JSON.parse(savedSession));
         }
     }, []);
