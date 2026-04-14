@@ -11,6 +11,7 @@ interface FeedbackModalProps {
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
     const { t } = useLanguage();
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [userEmail, setUserEmail] = useState('');
     const [message, setMessage] = useState('');
 
     if (!isOpen) return null;
@@ -22,15 +23,13 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
         setStatus('submitting');
         
         try {
-            const response = await fetch('https://formspree.io/f/mnnennlz', { // Note: Ideally the user should provide their own Formspree ID, but I can use a placeholder or help them set it up.
-                // For now, I'll use a direct mailto or a free service approach.
-                // Actually, I'll use a fetch to Formspree targeting their email.
+            const response = await fetch('https://formspree.io/f/mnnennlz', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    email: 'khoakpham83@gmail.com',
+                    sender_email: userEmail,
                     message: message,
-                    _subject: 'Vibraze User Feedback'
+                    _subject: `Góp ý từ ${userEmail}`
                 })
             });
 
@@ -69,6 +68,26 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                 ) : (
                     <form onSubmit={handleSubmit}>
                         <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                            <input 
+                                type="email"
+                                placeholder="Email của bạn để chúng tôi phản hồi..."
+                                value={userEmail}
+                                onChange={(e) => setUserEmail(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    border: '1px solid var(--glass-border)',
+                                    borderRadius: '10px',
+                                    padding: '10px 14px',
+                                    color: 'var(--text-main)',
+                                    marginBottom: '12px',
+                                    outline: 'none',
+                                    fontSize: '0.9rem'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
+                                onBlur={(e) => e.target.style.borderColor = 'var(--glass-border)'}
+                                required
+                            />
                             <textarea 
                                 placeholder="Nhập nhận xét hoặc góp ý của bạn tại đây..."
                                 value={message}
