@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { usePlayer } from '@/context/PlayerContext';
+import { useTheme } from '@/context/ThemeContext';
 
 const Background: React.FC = () => {
     const { currentSong } = usePlayer();
