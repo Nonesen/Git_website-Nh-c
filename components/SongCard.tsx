@@ -20,6 +20,12 @@ const SongCard: React.FC<SongCardProps> = ({ song }) => {
                 <div className={`play-overlay ${isCurrent && isPlaying ? 'playing' : ''}`}>
                     <i className={`fa-solid ${isCurrent && isPlaying ? 'fa-pause' : 'fa-play'}`}></i>
                 </div>
+                {song.isOnline && (
+                    <div className="online-badge">
+                        <i className="fa-solid fa-cloud"></i>
+                        <span>Online</span>
+                    </div>
+                )}
             </div>
             <h4>{song.title}</h4>
             <p>{song.artist}</p>

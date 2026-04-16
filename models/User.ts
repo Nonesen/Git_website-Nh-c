@@ -1,0 +1,24 @@
+import mongoose, { Document, Model, Schema } from 'mongoose';
+
+export interface IUser extends Document {
+    username: string;
+    password?: string; // Hashed password
+    name: string;
+    role: 'admin' | 'user';
+    likedSongs: string[]; // Store Song IDs or custom ID strings
+    createdAt: Date;
+}
+
+const UserSchema: Schema = new Schema({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    name: { type: String, required: true },
+    role: { type: String, enum: ['admin', 'user'], default: 'user' },
+    likedSongs: [{ type: String }],
+    createdAt: { type: Date, default: Date.now }
+});
+
+// Since Next.js API routes are stateless, we avoid compiling the model multiple times
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+
+export default User;

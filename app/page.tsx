@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import PlayerBar from '@/components/PlayerBar';
@@ -11,49 +11,108 @@ import Profile from '@/components/Profile';
 import FeedbackModal from '@/components/FeedbackModal';
 import { useLanguage } from '@/context/LanguageContext';
 import { usePlayer } from '@/context/PlayerContext';
+import { searchOnlineSongs } from '@/services/musicService';
 
-import { songs, Song } from '@/data/constants';
+import { Song } from '@/data/constants';
 
 export default function Home() {
   const { t } = useLanguage();
-  const { likedSongs } = usePlayer();
+  const { likedSongs, playlists, allSongs } = usePlayer();
   const [activeTab, setActiveTab] = useState('home');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [recentSongs, setRecentSongs] = useState<Song[]>([]);
-  const [displaySongs, setDisplaySongs] = useState<Song[]>(songs);
+  const [displaySongs, setDisplaySongs] = useState<Song[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [onlineSongs, setOnlineSongs] = useState<Song[]>([]);
+  const [trendingSongs, setTrendingSongs] = useState<Song[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isExploreLoading, setIsExploreLoading] = useState(false);
+
+  // Custom debounce function to avoid adding more deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchOnline = useCallback(
+    (() => {
+        let timeoutId: NodeJS.Timeout;
+        return (query: string) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(async () => {
+                if (!query.trim()) {
+                    setOnlineSongs([]);
+                    setIsSearching(false);
+                    return;
+                }
+                setIsSearching(true);
+                const results = await searchOnlineSongs(query);
+                setOnlineSongs(results);
+                setIsSearching(false);
+            }, 800);
+        };
+    })(),
+    []
+  );
+
+  useEffect(() => {
+    if (searchQuery.trim()) {
+        fetchOnline(searchQuery);
+    } else {
+        setOnlineSongs([]);
+        setIsSearching(false);
+    }
+  }, [searchQuery, fetchOnline]);
+
+  // Handle Trending Songs for Explore tab
+  useEffect(() => {
+    if (activeTab === 'explore' && trendingSongs.length === 0) {
+      const fetchTrending = async () => {
+        setIsExploreLoading(true);
+        const { getTrendingSongs } = await import('@/services/musicService');
+        const results = await getTrendingSongs();
+        setTrendingSongs(results);
+        setIsExploreLoading(false);
+      };
+      fetchTrending();
+    }
+  }, [activeTab, trendingSongs.length]);
 
   // Load recently played from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('vibraze_recent');
-    if (saved) {
+    if (saved && allSongs.length > 0) {
       const recentIds = JSON.parse(saved);
-      const filtered = recentIds.map((id: number) => songs.find(s => s.id === id)).filter(Boolean);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      const filtered = recentIds.map((id: any) => allSongs.find(s => s.id === id)).filter(Boolean);
       setRecentSongs(filtered);
     }
-  }, [activeTab]); // Refresh when switching tabs
+  }, [activeTab, allSongs]);
 
   // Update displayed songs based on active tab
   useEffect(() => {
-    if (activeTab === 'home') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDisplaySongs(songs);
+    // Immediate clear to prevent "sticky" data during transitions
+    if (!activeTab || allSongs.length === 0) return;
+    
+    if (activeTab === 'home' || activeTab === 'library') {
+      setDisplaySongs(allSongs);
     } else if (activeTab === 'explore') {
-      setDisplaySongs([...songs].sort(() => Math.random() - 0.5));
+      setDisplaySongs(trendingSongs);
     } else if (activeTab === 'recent') {
       setDisplaySongs(recentSongs);
     } else if (activeTab === 'liked') {
-      const filtered = likedSongs.map((id: number) => songs.find(s => s.id === id)).filter(Boolean) as Song[];
+      const filtered = likedSongs.map((id: any) => allSongs.find(s => s.id === id)).filter(Boolean) as Song[];
       setDisplaySongs(filtered);
+    } else if (activeTab.startsWith('playlist-')) {
+      const playlistId = activeTab.replace('playlist-', '');
+      const playlist = playlists.find(p => p.id === playlistId);
+      if (playlist) {
+        const filtered = playlist.songIds.map(id => allSongs.find(s => s.id === id)).filter(Boolean) as Song[];
+        setDisplaySongs(filtered);
+      }
     }
-  }, [activeTab, recentSongs, likedSongs]);
+  }, [activeTab, recentSongs, likedSongs, trendingSongs, playlists, allSongs]);
 
   const isAdminTab = activeTab.startsWith('admin-');
 
-  // Filter based on search query
-  const finalDisplaySongs = searchQuery.trim() 
+  // Filter local songs
+  const localSearchResults = searchQuery.trim() 
     ? displaySongs.filter(s => 
         s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         s.artist.toLowerCase().includes(searchQuery.toLowerCase())
@@ -72,7 +131,7 @@ export default function Home() {
           onSearch={(query) => setSearchQuery(query)}
         />
 
-        {activeTab === 'home' && (
+        {activeTab === 'home' && !searchQuery.trim() && (
           <section className="hero-section">
             <div className="hero-content">
               <h1>{t('hero-title')}</h1>
@@ -86,19 +145,39 @@ export default function Home() {
         ) : activeTab === 'profile' ? (
           <Profile />
         ) : (
-          <section className="song-list-container">
-            <div className="section-header">
-              <h2>
-                {activeTab === 'home' ? t('song-list-title') : 
-                 activeTab === 'recent' ? t('nav-recent') : 
-                 activeTab === 'explore' ? t('nav-explore') : 
-                 activeTab === 'liked' ? t('nav-liked') : t('song-list-title')}
-              </h2>
-              <span>{finalDisplaySongs.length} {t('song-count')}</span>
-            </div>
-            
-            <SongGrid songs={finalDisplaySongs} />
-          </section>
+          <div className="scroll-container">
+            {/* Local Section */}
+            <section className="song-list-container">
+              <div className="section-header">
+                <h2>
+                  {searchQuery.trim() ? t('search-local') : (
+                    activeTab === 'home' ? t('song-list-title') : 
+                    activeTab === 'recent' ? t('nav-recent') : 
+                    activeTab === 'explore' ? t('nav-explore') : 
+                    activeTab === 'liked' ? t('nav-liked') : t('song-list-title')
+                  )}
+                </h2>
+                {activeTab === 'explore' && isExploreLoading ? (
+                    <span className="searching-spinner"><i className="fa-solid fa-spinner fa-spin"></i> {t('searching')}</span>
+                ) : (
+                    <span>{localSearchResults.length} {t('song-count')}</span>
+                )}
+              </div>
+              <SongGrid songs={localSearchResults} />
+            </section>
+
+            {/* Online Section */}
+            {searchQuery.trim() && (
+              <section className="song-list-container online-section" style={{ marginTop: '2rem' }}>
+                <div className="section-header">
+                  <h2>{t('search-online')}</h2>
+                  {isSearching && <span className="searching-spinner"><i className="fa-solid fa-spinner fa-spin"></i> {t('searching')}</span>}
+                  {!isSearching && <span>{onlineSongs.length} {t('song-count')}</span>}
+                </div>
+                <SongGrid songs={onlineSongs} />
+              </section>
+            )}
+          </div>
         )}
       </main>
 

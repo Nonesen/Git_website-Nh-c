@@ -12,7 +12,8 @@ const Profile: React.FC = () => {
     const [activeTab, setActiveTab] = useState('All');
     const [isEditingName, setIsEditingName] = useState(false);
     const [userName, setUserName] = useState(user?.name || 'Người dùng');
-    const [avatar, setAvatar] = useState(`https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=6366f1&color=fff&size=200`);
+    // Using a default placeholder avatar focused on character
+    const [avatar, setAvatar] = useState('https://api.dicebear.com/7.x/avataaars/svg?seed=Lucky');
     const [cover, setCover] = useState('https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=2070');
     
     const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -65,7 +66,7 @@ const Profile: React.FC = () => {
             );
         }
 
-        if (activeTab === 'Albums' || activeTab === 'Popular tracks') {
+        if (activeTab === 'Albums') {
             return (
                 <div className="albums-container">
                     <div className="albums-header">
@@ -85,7 +86,7 @@ const Profile: React.FC = () => {
                     ) : (
                         <div className="playlist-grid">
                             {playlists.map(p => (
-                                <div key={p.id} className="playlist-item">
+                                <div key={p.id} className="playlist-item" style={{ cursor: 'pointer' }}>
                                     <div className="playlist-cover">
                                         <i className="fa-solid fa-compact-disc"></i>
                                     </div>
@@ -118,38 +119,39 @@ const Profile: React.FC = () => {
                 <input type="file" ref={coverInputRef} hidden accept="image/*" onChange={handleCoverChange} />
                 
                 <div className="profile-info-main">
-                    <div className="profile-avatar-container" onClick={() => avatarInputRef.current?.click()}>
-                        <img src={avatar} alt="Avatar" />
+                    <div className="profile-avatar-container circular-avatar" onClick={() => avatarInputRef.current?.click()}>
+                        <img src={avatar} alt="Avatar" className="circular-img" />
                         <div className="upload-overlay">
                             <i className="fa-solid fa-camera"></i>
                         </div>
                         <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={handleAvatarChange} />
                     </div>
-                    <div className="profile-text">
+                    <div className="profile-text text-white">
                         <div className="profile-name-edit">
                             {isEditingName ? (
                                 <input 
                                     type="text" 
                                     value={userName} 
                                     autoFocus
+                                    className="bg-transparent border-b-2 border-white text-white outline-none text-4xl font-bold"
                                     onChange={(e) => setUserName(e.target.value)}
                                     onBlur={() => setIsEditingName(false)}
                                     onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
                                 />
                             ) : (
-                                <h1 onClick={() => setIsEditingName(true)}>
-                                    {userName} <i className="fa-solid fa-pen-to-square edit-icon"></i>
+                                <h1 onClick={() => setIsEditingName(true)} className="flex items-center gap-2 cursor-pointer text-4xl font-bold">
+                                    {userName} <i className="fa-solid fa-pen-to-square edit-icon text-xl"></i>
                                 </h1>
                             )}
                         </div>
-                        <p>@{user.username}</p>
+                        <p className="opacity-80 text-lg">@{user.username}</p>
                     </div>
                 </div>
             </div>
             
             <nav className="profile-tabs">
                 <ul>
-                    {['All', 'Popular tracks', 'Tracks', 'Albums'].map(tab => (
+                    {['All', 'Tracks', 'Albums'].map(tab => (
                         <li 
                             key={tab} 
                             className={activeTab === tab ? 'active' : ''} 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { usePlayer } from '@/context/PlayerContext';
 import QueuePanel from './QueuePanel';
 
@@ -8,7 +8,7 @@ const PlayerBar: React.FC = () => {
     const {
         currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
         togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
-        likedSongs, toggleLike, playlists, addToPlaylist, createPlaylist, createAndAddToPlaylist,
+        likedSongs, toggleLike, playlists, addToPlaylist, createAndAddToPlaylist,
         addToNextUp
     } = usePlayer();
 

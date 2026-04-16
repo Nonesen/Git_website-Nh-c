@@ -1,9 +1,10 @@
 export interface Song {
-    id: number;
+    id: number | string;
     title: string;
     artist: string;
     cover: string;
     src: string;
+    isOnline?: boolean;
 }
 
 export const songs: Song[] = [
@@ -130,7 +131,11 @@ export const translations = {
         "nav-user": "Người dùng",
         "theme-dark": "Tối",
         "theme-light": "Sáng",
-        "theme-system": "Hệ thống"
+        "theme-system": "Hệ thống",
+        "search-local": "Nhạc trong máy",
+        "search-online": "Kết quả trực tuyến",
+        "online-track": "Trực tuyến",
+        "searching": "Đang tìm kiếm..."
     },
     en: {
         "nav-home": "Home",
@@ -161,7 +166,11 @@ export const translations = {
         "nav-user": "User view",
         "theme-dark": "Dark",
         "theme-light": "Light",
-        "theme-system": "System"
+        "theme-system": "System",
+        "search-local": "Local Songs",
+        "search-online": "Online Results",
+        "online-track": "Online",
+        "searching": "Searching..."
     }
 };
 

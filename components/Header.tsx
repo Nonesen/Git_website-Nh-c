@@ -84,11 +84,6 @@ const Header: React.FC<HeaderProps> = ({ setActiveTab, onLoginClick, onFeedbackC
                                 alt="Avatar"
                                 onClick={() => setIsUserDropdownOpen(prev => !prev)}
                             />
-                            <i
-                                className="fa-solid fa-chevron-down dropdown-arrow"
-                                onClick={() => setIsUserDropdownOpen(prev => !prev)}
-                                style={{ transform: isUserDropdownOpen ? 'rotate(180deg)' : 'rotate(0)' }}
-                            ></i>
 
                             {isUserDropdownOpen && (
                                 <div className="user-dropdown">

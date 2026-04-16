@@ -23,27 +23,40 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
         setStatus('submitting');
         
         try {
-            const response = await fetch('https://formspree.io/f/mnnennlz', {
+            // 1. Save to MongoDB Database (Primary)
+            const response = await fetch('/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    sender_email: userEmail,
-                    message: message,
-                    _subject: `Góp ý từ ${userEmail}`
+                    email: userEmail,
+                    message: message
                 })
             });
 
-            if (response.ok) {
-                setStatus('success');
-                setMessage('');
-                setTimeout(() => {
-                    onClose();
-                    setStatus('idle');
-                }, 2000);
-            } else {
-                setStatus('error');
-            }
+            // 2. Attempt Gmail delivery via FormSubmit.co (Superior for direct gmail)
+            await fetch('https://formsubmit.co/ajax/khoakpham83@gmail.com', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: userEmail,
+                    message: message,
+                    _subject: `Vibraze - Phản hồi mới từ ${userEmail}`,
+                    _template: 'table' 
+                })
+            });
+
+            setStatus('success');
+            setMessage('');
+            setTimeout(() => {
+                onClose();
+                setStatus('idle');
+            }, 2500);
+
         } catch (error) {
+            console.error('Feedback submission error:', error);
             setStatus('error');
         }
     };

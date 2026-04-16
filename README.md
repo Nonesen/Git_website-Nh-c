@@ -27,8 +27,8 @@
 | 📋 **Queue Panel** | Xem hàng chờ bài hát, click để phát bất kỳ bài nào |
 | 🌐 **Đa ngôn ngữ** | Hỗ trợ Tiếng Việt & English |
 | 🌙 **Dark / Light Mode** | Chuyển đổi chủ đề sáng/tối mượt mà |
-| 👤 **Hệ thống tài khoản** | Đăng nhập user/admin, session được ghi nhớ |
-| 🔐 **Admin Panel** | Quản lý nhạc, người dùng và xem thống kê (dành cho admin) |
+| 👤 **Hệ thống tài khoản** | Đăng nhập bằng MongoDB thực tế, bảo mật |
+| 🔐 **Admin Panel** | Quản lý nhạc (thêm trực tiếp vào DB), quản lý người dùng |
 | 📊 **Lịch sử nghe** | Ghi nhớ bài đã nghe gần đây |
 | 📱 **Responsive** | Giao diện tương thích mọi màn hình |
 
@@ -37,26 +37,28 @@
 ## 🛠️ Tech Stack
 
 - **Framework:** [Next.js 16](https://nextjs.org/) + App Router
+- **Database:** [MongoDB](https://www.mongodb.com/) (Managed by Railway)
+- **Deployment & Hosting:** [Vercel](https://vercel.com) & [Railway](https://railway.app)
 - **UI:** React 19 + TypeScript 5 + Vanilla CSS
 - **State:** React Context API (Player, Auth, Theme, Language)
-- **Fonts:** Inter + Plus Jakarta Sans (Google Fonts)
-- **Icons:** Font Awesome 6
-- **Deployment:** [Vercel](https://vercel.com) — auto-deploy on every push to `main`
+- **Security:** bcryptjs cho mã hóa mật khẩu
 
 ---
 
-## 🚀 Tài khoản Demo
+## 🚀 Cấu hình Môi trường (.env)
 
-| Username | Password | Vai trò |
-|---|---|---|
-| `admin` | `admin123` | Admin (toàn quyền) |
-| `user` | `user123` | Người dùng |
+Để chạy dự án với cơ sở dữ liệu thực, bạn cần tạo file `.env.local` ở thư mục gốc:
 
-## 🌐 Trải Nghiệm Trực Tuyến
+```env
+MONGODB_URI=mongodb://mongo:<password>@<host>:<port>
+```
 
-Ứng dụng hiện tại đã được loại bỏ hoàn toàn sự phụ thuộc vào môi trường máy chủ cục bộ (localhost). Bạn không cần phải tải code về hay chạy bất kỳ câu lệnh `npm run dev` nào. 
+## 🌐 Triển khai lên Vercel
 
-Chỉ cần truy cập vào đường link Vercel ở trên là bạn đã có thể trải nghiệm toàn bộ tính năng với dữ liệu được mô phỏng sẵn ngay trên trình duyệt của bạn (dữ liệu được lưu an toàn trong localStorage).
+1. Truy cập vào Dashboard dự án trên **Vercel**.
+2. Tìm phần **Settings** -> **Environment Variables**.
+3. Thêm biến `MONGODB_URI` với giá trị là chuỗi kết nối từ Railway của bạn.
+4. Bấm **Redeploy** để áp dụng thay đổi.
 
 ---
 

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { initialUsers } from '@/data/constants';
 
 interface User {
     username: string;
@@ -12,7 +11,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
-    login: (username: string, password: string) => boolean;
+    login: (username: string, password: string) => Promise<boolean>;
     logout: () => void;
 }
 
@@ -29,20 +28,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    const login = (username: string, password: string): boolean => {
-        // Simple mock login based on initialUsers
-        const found = initialUsers.find(u => u.username === username && u.password === password);
-        if (found) {
-            const userData: User = { 
-                username: found.username, 
-                name: found.name, 
-                role: found.role as 'admin' | 'user' 
-            };
-            setUser(userData);
-            sessionStorage.setItem('vibraze_session', JSON.stringify(userData));
-            return true;
+    const login = async (username: string, password: string): Promise<boolean> => {
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const userData: User = data.user;
+                setUser(userData);
+                sessionStorage.setItem('vibraze_session', JSON.stringify(userData));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Login error:', error);
+            return false;
         }
-        return false;
     };
 
     const logout = () => {

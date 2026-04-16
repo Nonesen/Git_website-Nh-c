@@ -22,9 +22,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         { id: 'recent', icon: 'fa-clock-rotate-left', label: 'nav-recent', userOnly: true, adminOnly: false },
         { id: 'explore', icon: 'fa-compass', label: 'nav-explore', userOnly: true, adminOnly: false },
         { id: 'library', icon: 'fa-music', label: 'nav-library', userOnly: true, adminOnly: false },
-        { id: 'admin-manage', icon: 'fa-list-check', label: 'Quản lý nhạc', userOnly: false, adminOnly: true },
+        { id: 'admin-manage', icon: 'fa-chart-pie', label: 'Bảng điều khiển Admin', userOnly: false, adminOnly: true },
         { id: 'admin-users', icon: 'fa-users', label: 'Quản lý User', userOnly: false, adminOnly: true },
-        { id: 'admin-stats', icon: 'fa-chart-line', label: 'Thống kê', userOnly: false, adminOnly: true },
     ];
 
     return (

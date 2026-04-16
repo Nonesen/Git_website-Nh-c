@@ -1,106 +1,256 @@
 'use client';
 
-import React from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { songs, initialUsers } from '@/data/constants';
+import { usePlayer } from '@/context/PlayerContext';
+import { Song } from '@/data/constants';
 
 interface AdminPanelProps {
-    view: 'music' | 'users' | 'stats';
+    view: 'manage' | 'users' | 'stats' | 'music';
+}
+
+interface Feedback {
+    id: string | number;
+    email: string;
+    message: string;
+    timestamp: string;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
     const { user } = useAuth();
+    const { allSongs, togglePlay } = usePlayer();
+    const [isAdding, setIsAdding] = useState(false);
+    const [newSong, setNewSong] = useState<Partial<Song>>({
+        title: '', artist: '', cover: '/img/', src: '/sound/'
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [users, setUsers] = useState<any[]>([]);
     
+    // Feedback state
+    const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch feedbacks
+                const fRes = await fetch('/api/feedback');
+                const fData = await fRes.json();
+                if (fData.success) setFeedbacks(fData.data);
+
+                // Fetch users
+                if (view === 'users') {
+                    const uRes = await fetch('/api/users');
+                    const uData = await uRes.json();
+                    if (uData.success) setUsers(uData.data);
+                }
+            } catch (err) {
+                console.error('Error fetching admin data:', err);
+            }
+        };
+        fetchData();
+    }, [view]);
+
     if (user?.role !== 'admin') return <div className="content">Access Denied</div>;
+
+    const handleSaveSong = async () => {
+        if (!newSong.title || !newSong.artist || !newSong.src) return;
+        setIsSubmitting(true);
+        try {
+            const response = await fetch('/api/songs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newSong)
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('Bài hát đã được lưu vào cơ sở dữ liệu!');
+                setIsAdding(false);
+                setNewSong({ title: '', artist: '', cover: '/img/', src: '/sound/' });
+                // Note: The PlayerContext will need to be told to refresh
+                window.location.reload(); 
+            }
+        } catch (error) {
+            console.error('Error saving song:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const clearFeedback = async () => {
+        if (confirm('Bạn có chắc muốn xóa tất cả phản hồi?')) {
+            try {
+                await fetch('/api/feedback', { method: 'DELETE' });
+                setFeedbacks([]);
+            } catch (err) {
+                console.error('Error clearing feedback:', err);
+            }
+        }
+    };
+
+    const isDashboard = view === 'manage' || view === 'stats' || view === 'music';
 
     return (
         <section id="admin-panel" className="admin-section">
             <div className="section-header">
-                 <h2>{view === 'music' ? 'Quản lý bài hát' : view === 'users' ? 'Quản lý người dùng' : 'Thống kê tổng quan'}</h2>
+                <h2>{view === 'users' ? 'Quản lý người dùng' : 'Bảng điều khiển Admin'}</h2>
             </div>
             
-            <div className="admin-tools" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
-                    <div className="stat-card" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-                        <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Tổng bài hát</h3>
-                        <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>{songs.length}</p>
-                    </div>
-                    <div className="stat-card" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-                        <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Tổng người dùng</h3>
-                        <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>{initialUsers.length}</p>
-                    </div>
-                    <div className="stat-card" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
-                        <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Lượt nghe (Mock)</h3>
-                        <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>1,234</p>
-                    </div>
-                </div>
+            <div className="admin-tools" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                {isDashboard && (
+                    <>
+                        {/* TOP STATS */}
+                        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                            <div className="stat-card" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                                <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Tổng bài hát</h3>
+                                <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>{allSongs.length}</p>
+                            </div>
+                            <div className="stat-card" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                                <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
+                                    Phiếu góp ý {feedbacks.length > 0 && <span style={{ background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '10px', fontSize: '0.7rem' }}>NEW</span>}
+                                </h3>
+                                <p style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>{feedbacks.length}</p>
+                            </div>
+                            <div className="stat-card" style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--glass-border)' }}>
+                                <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Trạng thái</h3>
+                                <p style={{ fontSize: '2rem', fontWeight: 800, color: '#22c55e' }}>ONLINE</p>
+                            </div>
+                        </div>
 
-                <div className="admin-main-content">
-                    <div className="section-header">
-                        <h3>{view === 'music' ? 'Danh sách bản ghi' : view === 'users' ? 'Tài khoản' : 'Chi tiết'}</h3>
-                        {view === 'music' && (
-                            <button className="btn-play-all" style={{ background: 'white', color: 'var(--primary-color)', border: 'none', padding: '10px 24px', borderRadius: '50px', fontWeight: 700, cursor: 'pointer' }}>
-                                <i className="fa-solid fa-plus"></i> Thêm bài hát mới
-                            </button>
-                        )}
-                    </div>
+                        {/* PREMIUM FEEDBACK LIST (MATCHING USER IMAGE) */}
+                        <div className="admin-feedback-section">
+                           <div className="section-header" style={{ marginBottom: '1.5rem' }}>
+                                <h3 style={{ fontSize: '1.2rem', color: 'var(--text-main)' }}>
+                                    <i className="fa-solid fa-envelope-open-text" style={{ marginRight: '10px', color: 'var(--primary-light)' }}></i>
+                                    Danh sách phiếu phản hồi
+                                </h3>
+                                {feedbacks.length > 0 && (
+                                    <button onClick={clearFeedback} className="btn-clear-all" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                                        Xóa tất cả phiếu
+                                    </button>
+                                )}
+                           </div>
 
-                    <div className="admin-table-container">
-                        {view === 'music' && (
-                            <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                                <thead>
-                                    <tr>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Mã</th>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Cover</th>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Tiêu đề</th>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Nghệ sĩ</th>
-                                        <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Công cụ</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {songs.map(song => (
-                                        <tr key={song.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <td style={{ padding: '12px' }}>#{song.id}</td>
-                                            <td style={{ padding: '12px' }}><img src={song.cover} alt="" style={{ width: '40px', borderRadius: '6px' }} /></td>
-                                            <td style={{ padding: '12px', fontWeight: 600 }}>{song.title}</td>
-                                            <td style={{ padding: '12px', color: 'var(--text-muted)' }}>{song.artist}</td>
-                                            <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                <button className="btn-action" style={{ background: 'transparent', border: '1px solid var(--glass-border)', color: 'white', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', marginRight: '6px' }}><i className="fa-solid fa-pen"></i></button>
-                                                <button className="btn-action delete" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}><i className="fa-solid fa-trash"></i></button>
-                                            </td>
+                           {feedbacks.length === 0 ? (
+                               <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--bg-card)', borderRadius: '20px', border: '1px dashed var(--glass-border)' }}>
+                                   <i className="fa-solid fa-inbox" style={{ fontSize: '3rem', color: 'var(--text-muted)', marginBottom: '1rem', display: 'block' }}></i>
+                                   <p style={{ color: 'var(--text-muted)' }}>Chưa có ý kiến đóng góp nào được ghi nhận.</p>
+                               </div>
+                           ) : (
+                               <div className="feedback-grid-premium" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '2rem' }}>
+                                   {feedbacks.map((f, idx) => (
+                                       <div key={f.id} className="feedback-ticket" style={{ background: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', color: '#333' }}>
+                                           {/* Header Ticket */}
+                                           <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', padding: '24px', textAlign: 'center', color: 'white' }}>
+                                               <h4 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>
+                                                   <i className="fa-regular fa-comment-dots" style={{ marginRight: '10px' }}></i>
+                                                   PHẢN HỒI GỬI ĐẾN BAN QUẢN TRỊ
+                                               </h4>
+                                               <p style={{ fontSize: '0.85rem', opacity: 0.9 }}>(V/v: Thư viện Giai Điệu - Melody Library)</p>
+                                           </div>
+
+                                           {/* Body Ticket */}
+                                           <div style={{ padding: '24px' }}>
+                                               <p style={{ marginBottom: '1rem', fontWeight: 600 }}>Xin chào <span style={{ color: '#6366f1' }}>Admin</span>,</p>
+                                               <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+                                                   Dưới đây là nội dung ý kiến đóng góp chân thành của người dùng, được ghi nhận vào hệ thống:
+                                               </p>
+
+                                               <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', borderLeft: '4px solid #6366f1' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px dashed #e2e8f0' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>📋</span>
+                                                        <span style={{ fontSize: '0.95rem', fontWeight: 700 }}>Mã phiếu góp ý: <span style={{ color: '#6366f1' }}>#00{feedbacks.length - idx}</span></span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px dashed #e2e8f0' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>📅</span>
+                                                        <span style={{ fontSize: '0.95rem' }}>Ngày gửi: <strong>{new Date(f.timestamp).toLocaleDateString('vi-VN')}</strong></span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px dashed #e2e8f0' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>👤</span>
+                                                        <span style={{ fontSize: '0.95rem' }}>Người gửi: <strong>{f.email}</strong></span>
+                                                    </div>
+                                                    <div style={{ display: 'flex', alignItems: 'start', gap: '12px' }}>
+                                                        <span style={{ fontSize: '1.2rem' }}>⏰</span>
+                                                        <div style={{ fontSize: '0.95rem' }}>
+                                                            <strong>Nội dung:</strong> <span style={{ color: '#334155', fontWeight: 500 }}>{f.message}</span>
+                                                        </div>
+                                                    </div>
+                                               </div>
+                                           </div>
+                                       </div>
+                                   ))}
+                               </div>
+                           )}
+                        </div>
+
+                        {/* MUSIC MANAGEMENT SECTION */}
+                        <div className="admin-main-content" style={{ marginTop: '2rem' }}>
+                            <div className="section-header">
+                                <h3>Quản lý kho nhạc</h3>
+                                <button className="btn-play-all" style={{ background: 'white', color: 'var(--primary-color)', border: 'none', padding: '10px 24px', borderRadius: '50px', fontWeight: 700, cursor: 'pointer' }} onClick={() => setIsAdding(!isAdding)}>
+                                    <i className={`fa-solid ${isAdding ? 'fa-xmark' : 'fa-plus'}`}></i> {isAdding ? 'Hủy bỏ' : 'Thêm bài hát mới'}
+                                </button>
+                            </div>
+
+                            {isAdding && (
+                                <div className="add-song-form" style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '16px', marginBottom: '2rem', border: '1px solid var(--primary-light)' }}>
+                                    <h4 style={{ marginBottom: '1.5rem' }}>Trình tạo mã bài hát mới</h4>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Tiêu đề</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.title} onChange={e => setNewSong({...newSong, title: e.target.value})} /></div>
+                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Nghệ sĩ</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.artist} onChange={e => setNewSong({...newSong, artist: e.target.value})} /></div>
+                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Cover URL</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.cover} onChange={e => setNewSong({...newSong, cover: e.target.value})} /></div>
+                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>File URL</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.src} onChange={e => setNewSong({...newSong, src: e.target.value})} /></div>
+                                    </div>
+                                    <button onClick={handleSaveSong} disabled={isSubmitting} style={{ marginTop: '1.5rem', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', opacity: isSubmitting ? 0.7 : 1 }}>
+                                        {isSubmitting ? 'ĐANG LƯU...' : 'LƯU VÀO CƠ SỞ DỮ LIỆU'}
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="admin-table-container">
+                                <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                                    <thead style={{ background: 'rgba(255,255,255,0.02)' }}>
+                                        <tr>
+                                            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Mã</th>
+                                            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Cover</th>
+                                            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Tiêu đề</th>
+                                            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Nghệ sĩ</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        )}
+                                    </thead>
+                                    <tbody>
+                                        {allSongs.map(song => (
+                                            <tr key={song.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <td style={{ padding: '14px' }}>#{song.id}</td>
+                                                <td style={{ padding: '14px' }}><img src={song.cover} alt="" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} /></td>
+                                                <td style={{ padding: '14px', fontWeight: 600 }}>{song.title}</td>
+                                                <td style={{ padding: '14px', color: 'var(--text-muted)' }}>{song.artist}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </>
+                )}
 
-                        {view === 'users' && (
-                            <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                                <thead>
-                                    <tr>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Tài khoản</th>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Tên hiển thị</th>
-                                        <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Phân quyền</th>
-                                        <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Công cụ</th>
+                {/* USERS VIEW */}
+                {view === 'users' && (
+                     <div className="admin-table-container">
+                        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                            <thead>
+                                <tr><th style={{ padding: '12px', textAlign: 'left' }}>Tài khoản</th><th style={{ padding: '12px' }}>Tên hiển thị</th><th style={{ padding: '12px' }}>Phân quyền</th></tr>
+                            </thead>
+                            <tbody>
+                                {users.map(u => (
+                                    <tr key={u.username} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <td style={{ padding: '12px', fontWeight: 600 }}>{u.username}</td>
+                                        <td style={{ padding: '12px' }}>{u.name}</td>
+                                        <td style={{ padding: '12px' }}><span style={{ background: u.role==='admin' ? '#f59e0b' : 'var(--primary-color)', padding: '4px 10px', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 'bold', color: 'white' }}>{u.role}</span></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {initialUsers.map(u => (
-                                        <tr key={u.username} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <td style={{ padding: '12px', fontWeight: 600 }}>{u.username}</td>
-                                            <td style={{ padding: '12px' }}>{u.name}</td>
-                                            <td style={{ padding: '12px' }}><span className="role-badge" style={{ background: u.role==='admin' ? '#f59e0b' : 'var(--primary-color)', padding: '4px 10px', borderRadius: '50px', fontSize: '0.8rem', fontWeight: 'bold' }}>{u.role}</span></td>
-                                            <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                <button className="btn-action" style={{ background: 'transparent', border: '1px solid var(--glass-border)', color: 'white', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer' }}><i className="fa-solid fa-user-gear"></i> Chỉnh sửa</button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        )}
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                )}
             </div>
         </section>
     );
