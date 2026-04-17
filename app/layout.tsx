@@ -20,6 +20,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Vibraze - Your Personal Music Experience",
   description: "A premium music experience built with Next.js",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
 };
 
 export default function RootLayout({
@@ -30,10 +31,14 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link 
           rel="preconnect"
-          href="https://ka-f.fontawesome.com"
-          crossOrigin="anonymous"
+          href="https://fonts.googleapis.com"
+        />
+        <link 
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600&display=swap"
         />
         <link 
           rel="stylesheet" 

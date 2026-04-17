@@ -140,7 +140,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                                    {feedbacks.map((f, idx) => (
                                        <div key={f.id} className="feedback-ticket" style={{ background: 'white', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', color: '#333' }}>
                                            {/* Header Ticket */}
-                                           <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', padding: '24px', textAlign: 'center', color: 'white' }}>
+                                           <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', padding: '24px', textAlign: 'center', color: 'white', position: 'relative' }}>
+                                               <button 
+                                                   onClick={async (e) => {
+                                                       e.stopPropagation();
+                                                       if (confirm('Xóa phiếu phản hồi này?')) {
+                                                           try {
+                                                               const res = await fetch(`/api/feedback/${f._id || f.id}`, { method: 'DELETE' });
+                                                               if ((await res.json()).success) {
+                                                                   setFeedbacks(prev => prev.filter(item => (item._id || item.id) !== (f._id || f.id)));
+                                                               }
+                                                           } catch (err) { console.error(err); }
+                                                       }
+                                                   }}
+                                                   style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(0,0,0,0.2)', border: 'none', color: 'white', cursor: 'pointer', borderRadius: '50%', width: '24px', height: '24px' }}
+                                               >
+                                                   <i className="fa-solid fa-xmark"></i>
+                                               </button>
                                                <h4 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>
                                                    <i className="fa-regular fa-comment-dots" style={{ marginRight: '10px' }}></i>
                                                    PHẢN HỒI GỬI ĐẾN BAN QUẢN TRỊ
@@ -214,6 +230,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                                             <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Cover</th>
                                             <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Tiêu đề</th>
                                             <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Nghệ sĩ</th>
+                                            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid var(--glass-border)', color: 'var(--text-muted)' }}>Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -223,6 +240,27 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                                                 <td style={{ padding: '14px' }}><img src={song.cover} alt="" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} /></td>
                                                 <td style={{ padding: '14px', fontWeight: 600 }}>{song.title}</td>
                                                 <td style={{ padding: '14px', color: 'var(--text-muted)' }}>{song.artist}</td>
+                                                <td style={{ padding: '14px', textAlign: 'right' }}>
+                                                    <button 
+                                                        onClick={async () => {
+                                                            if (confirm(`Bạn có chắc muốn xóa bài "${song.title}"?`)) {
+                                                                try {
+                                                                    const res = await fetch(`/api/songs/${song.id}`, { method: 'DELETE' });
+                                                                    const data = await res.json();
+                                                                    if (data.success) {
+                                                                        alert('Đã xóa bài hát!');
+                                                                        window.location.reload();
+                                                                    }
+                                                                } catch (err) {
+                                                                    console.error('Lỗi khi xóa nhạc:', err);
+                                                                }
+                                                            }
+                                                        }}
+                                                        style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' }}
+                                                    >
+                                                        <i className="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </td>
                                             </tr>
                                         ))}
                                     </tbody>

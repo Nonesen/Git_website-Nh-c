@@ -6,6 +6,7 @@ export interface IUser extends Document {
     name: string;
     role: 'admin' | 'user';
     likedSongs: string[]; // Store Song IDs or custom ID strings
+    playlists: { id: string, name: string, songIds: string[] }[];
     createdAt: Date;
 }
 
@@ -15,6 +16,11 @@ const UserSchema: Schema = new Schema({
     name: { type: String, required: true },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     likedSongs: [{ type: String }],
+    playlists: [{
+        id: String,
+        name: String,
+        songIds: [String]
+    }],
     createdAt: { type: Date, default: Date.now }
 });
 
