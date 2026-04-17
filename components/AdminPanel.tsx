@@ -11,6 +11,7 @@ interface AdminPanelProps {
 
 interface Feedback {
     id: string | number;
+    _id?: string;
     email: string;
     message: string;
     timestamp: string;

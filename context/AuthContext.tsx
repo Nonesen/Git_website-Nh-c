@@ -6,6 +6,8 @@ interface User {
     username: string;
     name: string;
     role: 'admin' | 'user';
+    likedSongs?: string[];
+    playlists?: any[];
 }
 
 interface AuthContextType {

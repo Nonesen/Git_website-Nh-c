@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-const ReactPlayer = dynamic(() => import('react-player/lazy'), { ssr: false });
+const ReactPlayer = dynamic<any>(() => import('react-player'), { ssr: false });
 import { useAuth } from './AuthContext';
 import { Song, songs } from '@/data/constants';
 
@@ -52,6 +52,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null);
     const [isYoutubeLoading, setIsYoutubeLoading] = useState(false);
     
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const playerRef = useRef<any>(null);
+
     const { user, isAuthenticated } = useAuth();
     
     // Initial fetch of songs & local storage fallback
@@ -341,20 +344,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             {/* Hidden ReactPlayer for YouTube Audio */}
             {youtubeUrl && (
                 <div style={{ display: 'none' }}>
+                    {/* @ts-ignore */}
                     <ReactPlayer
                         ref={playerRef}
-                        url={youtubeUrl}
+                        url={youtubeUrl as string}
                         playing={isPlaying}
                         volume={volume}
-                        onProgress={(state) => setCurrentTime(state.playedSeconds)}
-                        onDuration={(d) => setDuration(d)}
+                        onProgress={(state: any) => setCurrentTime(state.playedSeconds)}
+                        onDuration={(d: any) => setDuration(d)}
                         onEnded={nextSong}
-                        onError={(e) => console.error('ReactPlayer Error:', e)}
+                        onError={(e: any) => console.error('ReactPlayer Error:', e)}
                         config={{
                             youtube: {
                                 playerVars: { autoplay: 1, controls: 0 }
                             }
-                        }}
+                        } as any}
                     />
                 </div>
             )}
