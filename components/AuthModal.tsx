@@ -22,11 +22,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        const success = await login(username, password);
-        if (success) {
+        const result = await login(username, password);
+        if (result.success) {
             onClose();
         } else {
-            setError('Sai tên đăng nhập hoặc mật khẩu!');
+            setError(result.message || 'Sai tên đăng nhập hoặc mật khẩu!');
         }
     };
 

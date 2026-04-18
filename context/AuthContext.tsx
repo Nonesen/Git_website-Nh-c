@@ -13,7 +13,7 @@ interface User {
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (username: string, password: string) => Promise<{ success: boolean; message?: string }>;
     logout: () => void;
 }
 
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    const login = async (username: string, password: string): Promise<boolean> => {
+    const login = async (username: string, password: string): Promise<{ success: boolean; message?: string }> => {
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -44,12 +44,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const userData: User = data.user;
                 setUser(userData);
                 sessionStorage.setItem('vibraze_session', JSON.stringify(userData));
-                return true;
+                return { success: true };
             }
-            return false;
+            return { success: false, message: data.message || 'Sai tên đăng nhập hoặc mật khẩu!' };
         } catch (error) {
             console.error('Login error:', error);
-            return false;
+            return { success: false, message: 'Lỗi kết nối máy chủ!' };
         }
     };
 

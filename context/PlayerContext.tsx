@@ -130,20 +130,25 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const playSong = useCallback(async (song: Song) => {
         try {
+            // 1. Stop everything current immediately
             setIsPlaying(false);
-            setCurrentSong(song);
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+            }
             setYoutubeUrl(null);
+            
+            // 2. Set new song
+            setCurrentSong(song);
 
             // CASE 1: Online Song (Need YouTube ID)
             if (song.isOnline) {
-                if (audioRef.current) audioRef.current.src = ''; // Stop current audio
-                
                 try {
                     const res = await fetch(`/api/youtube?q=${encodeURIComponent(song.title + ' ' + song.artist)}`);
                     const data = await res.json();
                     if (data.success) {
                         setYoutubeUrl(`https://www.youtube.com/watch?v=${data.videoId}`);
-                        // Playback will be handled by ReactPlayer's onReady or playing prop
+                        // Playback will be handled by ReactPlayer via isPlaying
                     } else {
                         // Fallback to preview
                         if (audioRef.current) {
@@ -160,10 +165,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             // CASE 2: Local Song
             else {
                 if (audioRef.current) {
-                    if (currentSong?.id !== song.id || !audioRef.current.src.includes(encodeURI(song.src))) {
-                        audioRef.current.src = song.src;
-                        audioRef.current.load();
-                    }
+                    audioRef.current.src = song.src;
+                    audioRef.current.load();
                     await audioRef.current.play();
                     setIsPlaying(true);
                 }

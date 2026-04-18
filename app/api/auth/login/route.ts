@@ -18,8 +18,11 @@ export async function POST(request: Request) {
         let isMatch = false;
         try {
             isMatch = await bcrypt.compare(password, user.password as string);
-        } catch {
-            // If bcrypt fails (maybe it's plain text), do a direct comparison
+        } catch (error) {
+            console.log('Bcrypt error, falling back to plain text check');
+        }
+
+        if (!isMatch) {
             isMatch = password === user.password;
         }
 
