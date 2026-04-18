@@ -162,9 +162,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
                     setIsPlaying(true);
                 }
             } 
-            // CASE 2: Local Song
+            // CASE 2: Local Song (or manually added YouTube link)
             else {
-                if (audioRef.current) {
+                const isYoutube = song.src.includes('youtube.com') || song.src.includes('youtu.be');
+                
+                if (isYoutube) {
+                    setYoutubeUrl(song.src);
+                    setIsPlaying(true);
+                } else if (audioRef.current) {
                     audioRef.current.src = song.src;
                     audioRef.current.load();
                     await audioRef.current.play();

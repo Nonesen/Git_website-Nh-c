@@ -26,6 +26,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
     });
     const [users, setUsers] = useState<{ username: string; name: string; role: string }[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [localSounds, setLocalSounds] = useState<string[]>([]);
+    const [localImages, setLocalImages] = useState<string[]>([]);
+    const [useExternalSource, setUseExternalSource] = useState(false);
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [pickerType, setPickerType] = useState<'sound' | 'img'>('sound');
+    const [pickerSearch, setPickerSearch] = useState('');
     
     // Feedback state
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
@@ -37,6 +43,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                 const fRes = await fetch('/api/feedback');
                 const fData = await fRes.json();
                 if (fData.success) setFeedbacks(fData.data);
+
+                // Fetch local files
+                const sRes = await fetch('/api/files?type=sound');
+                const sData = await sRes.json();
+                if (sData.success) setLocalSounds(sData.files);
+
+                const iRes = await fetch('/api/files?type=img');
+                const iData = await iRes.json();
+                if (iData.success) setLocalImages(iData.files);
 
                 // Fetch users
                 if (view === 'users') {
@@ -210,12 +225,68 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
 
                             {isAdding && (
                                 <div className="add-song-form" style={{ background: 'rgba(255,255,255,0.05)', padding: '2rem', borderRadius: '16px', marginBottom: '2rem', border: '1px solid var(--primary-light)' }}>
-                                    <h4 style={{ marginBottom: '1.5rem' }}>Trình tạo mã bài hát mới</h4>
+                                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '10px', width: 'fit-content' }}>
+                                        <button 
+                                            onClick={() => setUseExternalSource(false)}
+                                            style={{ background: !useExternalSource ? 'var(--primary-color)' : 'transparent', color: 'white', border: 'none', padding: '6px 15px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                                        >
+                                            <i className="fa-solid fa-folder-open" style={{marginRight: '6px'}}></i> File trong máy
+                                        </button>
+                                        <button 
+                                            onClick={() => setUseExternalSource(true)}
+                                            style={{ background: useExternalSource ? 'var(--primary-color)' : 'transparent', color: 'white', border: 'none', padding: '6px 15px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}
+                                        >
+                                            <i className="fa-brands fa-youtube" style={{marginRight: '6px'}}></i> Link ngoài (YT/URL)
+                                        </button>
+                                    </div>
+
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Tiêu đề</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.title} onChange={e => setNewSong({...newSong, title: e.target.value})} /></div>
-                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Nghệ sĩ</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.artist} onChange={e => setNewSong({...newSong, artist: e.target.value})} /></div>
-                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Cover URL</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.cover} onChange={e => setNewSong({...newSong, cover: e.target.value})} /></div>
-                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>File URL</label><input type="text" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.src} onChange={e => setNewSong({...newSong, src: e.target.value})} /></div>
+                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Tiêu đề</label><input type="text" placeholder="Thanh Xuân" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.title} onChange={e => setNewSong({...newSong, title: e.target.value})} /></div>
+                                        <div className="form-group"><label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Nghệ sĩ</label><input type="text" placeholder="Da LAB" style={{ width: '100%', background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white' }} value={newSong.artist} onChange={e => setNewSong({...newSong, artist: e.target.value})} /></div>
+                                        
+                                        <div className="form-group">
+                                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>Cover URL (Ảnh bìa)</label>
+                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                                <input 
+                                                    type="text" 
+                                                    readOnly={!useExternalSource}
+                                                    placeholder={useExternalSource ? "https://..." : "Chọn từ thư mục..."} 
+                                                    style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white', opacity: !useExternalSource ? 0.8 : 1 }} 
+                                                    value={newSong.cover} 
+                                                    onChange={e => useExternalSource && setNewSong({...newSong, cover: e.target.value})} 
+                                                />
+                                                {!useExternalSource && (
+                                                    <button 
+                                                        onClick={() => { setPickerType('img'); setPickerOpen(true); }}
+                                                        style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                                                    >
+                                                        <i className="fa-solid fa-magnifying-glass"></i> Chọn
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem' }}>File URL (Link nhạc)</label>
+                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                                <input 
+                                                    type="text" 
+                                                    readOnly={!useExternalSource}
+                                                    placeholder={useExternalSource ? "YouTube Link..." : "Chọn từ thư mục..."} 
+                                                    style={{ flex: 1, background: 'var(--bg-card)', border: '1px solid var(--glass-border)', padding: '10px', borderRadius: '8px', color: 'white', opacity: !useExternalSource ? 0.8 : 1 }} 
+                                                    value={newSong.src} 
+                                                    onChange={e => useExternalSource && setNewSong({...newSong, src: e.target.value})} 
+                                                />
+                                                {!useExternalSource && (
+                                                    <button 
+                                                        onClick={() => { setPickerType('sound'); setPickerOpen(true); }}
+                                                        style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                                                    >
+                                                        <i className="fa-solid fa-music"></i> Chọn
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                     <button onClick={handleSaveSong} disabled={isSubmitting} style={{ marginTop: '1.5rem', background: 'var(--primary-color)', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', opacity: isSubmitting ? 0.7 : 1 }}>
                                         {isSubmitting ? 'ĐANG LƯU...' : 'LƯU VÀO CƠ SỞ DỮ LIỆU'}
@@ -291,6 +362,95 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                     </div>
                 )}
             </div>
+            {/* FILE PICKER MODAL */}
+            {pickerOpen && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                    <div style={{ background: '#1a1a2e', width: '100%', maxWidth: '700px', maxHeight: '80vh', borderRadius: '24px', border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}>
+                        {/* Header */}
+                        <div style={{ padding: '20px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h3 style={{ fontSize: '1.2rem', margin: 0 }}>
+                                <i className={`fa-solid ${pickerType === 'img' ? 'fa-image' : 'fa-music'}`} style={{ marginRight: '12px', color: 'var(--primary-light)' }}></i>
+                                Chọn {pickerType === 'img' ? 'Ảnh bìa' : 'Bài hát'} từ thư mục
+                            </h3>
+                            <button onClick={() => setPickerOpen(false)} style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1.2rem' }}>
+                                <i className="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        {/* Search */}
+                        <div style={{ padding: '15px 20px' }}>
+                            <input 
+                                type="text" 
+                                placeholder="Tìm kiếm file..." 
+                                style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', padding: '12px', borderRadius: '12px', color: 'white' }}
+                                value={pickerSearch}
+                                onChange={e => setPickerSearch(e.target.value)}
+                            />
+                        </div>
+
+                        {/* List */}
+                        <div style={{ flex: 1, overflowY: 'auto', padding: '10px 20px 20px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: pickerType === 'img' ? 'repeat(auto-fill, minmax(130px, 1fr))' : '1fr', gap: '12px' }}>
+                                {(pickerType === 'img' ? localImages : localSounds)
+                                    .filter(file => file.toLowerCase().includes(pickerSearch.toLowerCase()))
+                                    .map(file => (
+                                        <div 
+                                            key={file} 
+                                            onClick={() => {
+                                                if (pickerType === 'img') {
+                                                    setNewSong({...newSong, cover: `/img/${file}`});
+                                                } else {
+                                                    const cleanTitle = file.replace(/\.(mp3|wav|m4a)$/i, '').replace(/_/g, ' ');
+                                                    setNewSong({...newSong, src: `/sound/${file}`, title: newSong.title || cleanTitle});
+                                                }
+                                                setPickerOpen(false);
+                                                setPickerSearch('');
+                                            }}
+                                            style={{ 
+                                                padding: '12px', 
+                                                background: 'rgba(255,255,255,0.03)', 
+                                                borderRadius: '12px', 
+                                                cursor: 'pointer', 
+                                                border: '1px solid transparent',
+                                                transition: 'all 0.2s',
+                                                display: 'flex',
+                                                flexDirection: pickerType === 'img' ? 'column' : 'row',
+                                                alignItems: 'center',
+                                                gap: '12px'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                                                e.currentTarget.style.borderColor = 'var(--primary-light)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                                                e.currentTarget.style.borderColor = 'transparent';
+                                            }}
+                                        >
+                                            {pickerType === 'img' ? (
+                                                <>
+                                                    <img src={`/img/${file}`} alt="" style={{ width: '100%', aspectRatio: '1/1', borderRadius: '8px', objectFit: 'cover', marginBottom: '8px' }} />
+                                                    <span style={{ fontSize: '0.75rem', textAlign: 'center', wordBreak: 'break-all', opacity: 0.8 }}>{file}</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fa-solid fa-file-audio" style={{ fontSize: '1.2rem', color: 'var(--primary-light)' }}></i>
+                                                    <span style={{ fontSize: '0.9rem', flex: 1 }}>{file}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{ padding: '15px 20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)', borderTop: '1px solid var(--glass-border)' }}>
+                            Tìm thấy { (pickerType === 'img' ? localImages : localSounds).length } file trong thư mục
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 };
