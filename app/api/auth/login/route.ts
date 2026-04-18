@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         let isMatch = false;
         try {
             isMatch = await bcrypt.compare(password, user.password as string);
-        } catch (e) {
+        } catch {
             // If bcrypt fails (maybe it's plain text), do a direct comparison
             isMatch = password === user.password;
         }
@@ -36,7 +36,10 @@ export async function POST(request: Request) {
             }
         });
 
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    } catch (error) {
+        return NextResponse.json({ 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Unknown error' 
+        }, { status: 500 });
     }
 }

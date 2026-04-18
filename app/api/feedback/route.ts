@@ -8,8 +8,8 @@ export async function GET() {
         await dbConnect();
         const feedbacks = await Feedback.find({}).sort({ timestamp: -1 });
         return NextResponse.json({ success: true, data: feedbacks });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }
 
@@ -53,8 +53,8 @@ export async function POST(request: Request) {
         transporter.sendMail(mailOptions).catch(err => console.error('Email Error:', err));
 
         return NextResponse.json({ success: true, data: feedback });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }
 
@@ -64,7 +64,7 @@ export async function DELETE() {
         // Danger: Clears all feedback. In production check admin token first.
         await Feedback.deleteMany({});
         return NextResponse.json({ success: true });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }

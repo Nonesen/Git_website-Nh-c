@@ -6,16 +6,22 @@ if (!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
+declare global {
+    var mongoose: {
+        conn: mongoose.Connection | null;
+        promise: Promise<mongoose.Connection> | null;
+    } | undefined;
+}
+
 /**
  * Global is used here to maintain a cached connection across hot reloads
  * in development. This prevents connections growing exponentially
  * during API Route usage.
  */
-let cached = (global as any).mongoose;
-
-if (!cached) {
-    cached = (global as any).mongoose = { conn: null, promise: null };
+if (!global.mongoose) {
+    global.mongoose = { conn: null, promise: null };
 }
+const cached = global.mongoose;
 
 async function dbConnect() {
     if (cached.conn) {
@@ -28,7 +34,7 @@ async function dbConnect() {
         };
 
         cached.promise = mongoose.connect(MONGODB_URI as string, opts).then((mongoose) => {
-            return mongoose;
+            return mongoose.connection;
         });
     }
 

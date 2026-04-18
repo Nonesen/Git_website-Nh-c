@@ -24,7 +24,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
         
         try {
             // 1. Save to MongoDB Database (Primary)
-            const response = await fetch('/api/feedback', {
+            await fetch('/api/feedback', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

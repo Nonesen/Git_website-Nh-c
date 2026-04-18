@@ -7,7 +7,7 @@ interface User {
     name: string;
     role: 'admin' | 'user';
     likedSongs?: string[];
-    playlists?: any[];
+    playlists?: { id: string; name: string; songIds: (number | string)[] }[];
 }
 
 interface AuthContextType {

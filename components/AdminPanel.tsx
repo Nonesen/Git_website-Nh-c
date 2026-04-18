@@ -19,13 +19,13 @@ interface Feedback {
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
     const { user } = useAuth();
-    const { allSongs, togglePlay } = usePlayer();
+    const { allSongs } = usePlayer();
     const [isAdding, setIsAdding] = useState(false);
     const [newSong, setNewSong] = useState<Partial<Song>>({
         title: '', artist: '', cover: '/img/', src: '/sound/'
     });
+    const [users, setUsers] = useState<{ username: string; name: string; role: string }[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [users, setUsers] = useState<any[]>([]);
     
     // Feedback state
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);

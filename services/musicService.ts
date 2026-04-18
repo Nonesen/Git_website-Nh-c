@@ -8,7 +8,13 @@ export async function searchOnlineSongs(query: string): Promise<Song[]> {
         const response = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=30`);
         const data = await response.json();
 
-        return data.results.map((item: any) => ({
+        return data.results.map((item: { 
+            trackId: number; 
+            trackName: string; 
+            artistName: string; 
+            artworkUrl100: string; 
+            previewUrl: string; 
+        }) => ({
             id: `online-${item.trackId}`,
             title: item.trackName,
             artist: item.artistName,
@@ -31,7 +37,13 @@ export async function getTrendingSongs(): Promise<Song[]> {
 
         if (!data.feed || !data.feed.entry) return [];
 
-        return data.feed.entry.map((entry: any) => {
+        return data.feed.entry.map((entry: { 
+            id: { attributes: { 'im:id': string } };
+            'im:name': { label: string };
+            'im:artist': { label: string };
+            'im:image': { label: string }[];
+            link: { attributes: { href: string } }[];
+        }) => {
             const trackId = entry.id.attributes['im:id'];
             return {
                 id: `trending-${trackId}`,

@@ -80,7 +80,7 @@ export default function Home() {
     const saved = localStorage.getItem('vibraze_recent');
     if (saved && allSongs.length > 0) {
       const recentIds = JSON.parse(saved);
-      const filtered = recentIds.map((id: any) => allSongs.find(s => s.id === id)).filter(Boolean);
+      const filtered = recentIds.map((id: string | number) => allSongs.find(s => s.id === id)).filter(Boolean) as Song[];
       setRecentSongs(filtered);
     }
   }, [activeTab, allSongs]);
@@ -97,7 +97,7 @@ export default function Home() {
     } else if (activeTab === 'recent') {
       setDisplaySongs(recentSongs);
     } else if (activeTab === 'liked') {
-      const filtered = likedSongs.map((id: any) => allSongs.find(s => s.id === id)).filter(Boolean) as Song[];
+      const filtered = likedSongs.map((id: string | number) => allSongs.find(s => s.id === id)).filter(Boolean) as Song[];
       setDisplaySongs(filtered);
     } else if (activeTab.startsWith('playlist-')) {
       const playlistId = activeTab.replace('playlist-', '');

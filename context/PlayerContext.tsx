@@ -1,10 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-const ReactPlayer = dynamic<any>(() => import('react-player'), { ssr: false });
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 import { useAuth } from './AuthContext';
-import { Song, songs } from '@/data/constants';
+import { Song } from '@/data/constants';
 
 interface PlayerContextType {
     currentSong: Song | null;
@@ -50,10 +50,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const [playlists, setPlaylists] = useState<{ id: string, name: string, songIds: (number | string)[] }[]>([]);
     const [queue, setQueue] = useState<Song[]>([]);
     const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null);
-    const [isYoutubeLoading, setIsYoutubeLoading] = useState(false);
     
     const audioRef = useRef<HTMLAudioElement | null>(null);
-    const playerRef = useRef<any>(null);
+    const playerRef = useRef<unknown>(null);
 
     const { user, isAuthenticated } = useAuth();
     
@@ -83,7 +82,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             const savedPlaylists = localStorage.getItem('vibraze_playlists');
             if (savedPlaylists) {
                 const parsed = JSON.parse(savedPlaylists);
-                setPlaylists(parsed.filter((p: any) => p.id !== 'p-1' && p.id !== 'p-2'));
+                setPlaylists(parsed.filter((p: { id: string }) => p.id !== 'p-1' && p.id !== 'p-2'));
             }
         }
 
@@ -92,14 +91,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             const v = parseFloat(savedVol);
             if (!isNaN(v) && v >= 0 && v <= 1) setVolumeState(v);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, currentSong]);
 
     // Sync from Cloud when user logs in
     useEffect(() => {
         if (isAuthenticated && user) {
             // Priority to server-side data
             if (user.likedSongs) setLikedSongs(user.likedSongs);
-            // @ts-ignore
             if (user.playlists) setPlaylists(user.playlists);
         }
     }, [isAuthenticated, user]);
@@ -128,6 +126,95 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const timer = setTimeout(syncToCloud, 2000);
         return () => clearTimeout(timer);
     }, [likedSongs, playlists, isAuthenticated, user]);
+
+
+    const playSong = useCallback(async (song: Song) => {
+        try {
+            setIsPlaying(false);
+            setCurrentSong(song);
+            setYoutubeUrl(null);
+
+            // CASE 1: Online Song (Need YouTube ID)
+            if (song.isOnline) {
+                if (audioRef.current) audioRef.current.src = ''; // Stop current audio
+                
+                try {
+                    const res = await fetch(`/api/youtube?q=${encodeURIComponent(song.title + ' ' + song.artist)}`);
+                    const data = await res.json();
+                    if (data.success) {
+                        setYoutubeUrl(`https://www.youtube.com/watch?v=${data.videoId}`);
+                        // Playback will be handled by ReactPlayer's onReady or playing prop
+                    } else {
+                        // Fallback to preview
+                        if (audioRef.current) {
+                            audioRef.current.src = song.src;
+                            await audioRef.current.play();
+                        }
+                    }
+                } catch (err) {
+                    console.error('YouTube fetch error:', err);
+                } finally {
+                    setIsPlaying(true);
+                }
+            } 
+            // CASE 2: Local Song
+            else {
+                if (audioRef.current) {
+                    if (currentSong?.id !== song.id || !audioRef.current.src.includes(encodeURI(song.src))) {
+                        audioRef.current.src = song.src;
+                        audioRef.current.load();
+                    }
+                    await audioRef.current.play();
+                    setIsPlaying(true);
+                }
+            }
+            
+            const recent = JSON.parse(localStorage.getItem('vibraze_recent') || '[]');
+            const updated = [song.id, ...recent.filter((id: string | number) => id !== song.id)].slice(0, 20);
+            localStorage.setItem('vibraze_recent', JSON.stringify(updated));
+            window.dispatchEvent(new Event('vibraze_recent_updated'));
+        } catch (error) {
+            console.warn("Playback interrupted", error);
+        }
+    }, [currentSong?.id]);
+
+    const togglePlay = async () => {
+        try {
+            if (isPlaying) {
+                if (audioRef.current) audioRef.current.pause();
+                setIsPlaying(false);
+            } else {
+                if (audioRef.current) await audioRef.current.play();
+                setIsPlaying(true);
+            }
+        } catch (error) {
+            console.warn("Toggle playback intercepted", error);
+        }
+    };
+
+    const nextSong = useCallback(() => {
+        if (!currentSong) return;
+        
+        if (queue.length > 0) {
+            const nextFromQueue = queue[0];
+            setQueue(prev => prev.slice(1));
+            playSong(nextFromQueue);
+            return;
+        }
+
+        let nextIdx;
+        const currentSongsList = allSongs; 
+        const currentIdx = currentSongsList.findIndex(s => s.id === currentSong.id);
+        
+        if (isShuffle) {
+            nextIdx = Math.floor(Math.random() * currentSongsList.length);
+        } else {
+            nextIdx = currentIdx === -1 ? 0 : (currentIdx + 1) % currentSongsList.length;
+        }
+        if (currentSongsList[nextIdx]) {
+            playSong(currentSongsList[nextIdx]);
+        }
+    }, [currentSong, queue, allSongs, isShuffle, playSong]);
 
     useEffect(() => {
         if (!audioRef.current) {
@@ -161,97 +248,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             audio.removeEventListener('loadedmetadata', updateDuration);
             audio.removeEventListener('ended', onEnded);
         };
-    }, [isRepeat, isShuffle, currentSong]);
-
-    const playSong = async (song: Song) => {
-        try {
-            setIsPlaying(false);
-            setCurrentSong(song);
-            setYoutubeUrl(null);
-
-            // CASE 1: Online Song (Need YouTube ID)
-            if (song.isOnline) {
-                setIsYoutubeLoading(true);
-                if (audioRef.current) audioRef.current.src = ''; // Stop current audio
-                
-                try {
-                    const res = await fetch(`/api/youtube?q=${encodeURIComponent(song.title + ' ' + song.artist)}`);
-                    const data = await res.json();
-                    if (data.success) {
-                        setYoutubeUrl(`https://www.youtube.com/watch?v=${data.videoId}`);
-                        // Playback will be handled by ReactPlayer's onReady or playing prop
-                    } else {
-                        // Fallback to preview
-                        if (audioRef.current) {
-                            audioRef.current.src = song.src;
-                            await audioRef.current.play();
-                        }
-                    }
-                } catch (err) {
-                    console.error('YouTube fetch error:', err);
-                } finally {
-                    setIsYoutubeLoading(false);
-                    setIsPlaying(true);
-                }
-            } 
-            // CASE 2: Local Song
-            else {
-                if (audioRef.current) {
-                    if (currentSong?.id !== song.id || !audioRef.current.src.includes(encodeURI(song.src))) {
-                        audioRef.current.src = song.src;
-                        audioRef.current.load();
-                    }
-                    await audioRef.current.play();
-                    setIsPlaying(true);
-                }
-            }
-            
-            const recent = JSON.parse(localStorage.getItem('vibraze_recent') || '[]');
-            const updated = [song.id, ...recent.filter((id: any) => id !== song.id)].slice(0, 20);
-            localStorage.setItem('vibraze_recent', JSON.stringify(updated));
-            window.dispatchEvent(new Event('vibraze_recent_updated'));
-        } catch (error) {
-            console.warn("Playback interrupted", error);
-        }
-    };
-
-    const togglePlay = async () => {
-        try {
-            if (isPlaying) {
-                if (audioRef.current) audioRef.current.pause();
-                setIsPlaying(false);
-            } else {
-                if (audioRef.current) await audioRef.current.play();
-                setIsPlaying(true);
-            }
-        } catch (error) {
-            console.warn("Toggle playback intercepted", error);
-        }
-    };
-
-    const nextSong = () => {
-        if (!currentSong) return;
-        
-        if (queue.length > 0) {
-            const nextFromQueue = queue[0];
-            setQueue(prev => prev.slice(1));
-            playSong(nextFromQueue);
-            return;
-        }
-
-        let nextIdx;
-        const currentSongsList = allSongs; 
-        const currentIdx = currentSongsList.findIndex(s => s.id === currentSong.id);
-        
-        if (isShuffle) {
-            nextIdx = Math.floor(Math.random() * currentSongsList.length);
-        } else {
-            nextIdx = currentIdx === -1 ? 0 : (currentIdx + 1) % currentSongsList.length;
-        }
-        if (currentSongsList[nextIdx]) {
-            playSong(currentSongsList[nextIdx]);
-        }
-    };
+    }, [isRepeat, isShuffle, currentSong, nextSong, volume]);
 
     const prevSong = () => {
         if (!currentSong || allSongs.length === 0) return;
@@ -277,9 +274,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const toggleRepeat = () => setIsRepeat(!isRepeat);
 
     const toggleLike = (songId: number | string) => {
-        setLikedSongs((prev: any) => {
+        setLikedSongs((prev) => {
             const isLiked = prev.includes(songId);
-            const newLikes = isLiked ? prev.filter((id: any) => id !== songId) : [...prev, songId];
+            const newLikes = isLiked ? prev.filter((id) => id !== songId) : [...prev, songId];
             localStorage.setItem('vibraze_likes', JSON.stringify(newLikes));
             window.dispatchEvent(new Event('vibraze_likes_updated'));
             return newLikes;
@@ -344,21 +341,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             {/* Hidden ReactPlayer for YouTube Audio */}
             {youtubeUrl && (
                 <div style={{ display: 'none' }}>
-                    {/* @ts-ignore */}
+                    {/* @ts-expect-error - dynamic import typing conflict */}
                     <ReactPlayer
-                        ref={playerRef}
-                        url={youtubeUrl as string}
+                        ref={playerRef as never}
+                        url={youtubeUrl}
                         playing={isPlaying}
                         volume={volume}
-                        onProgress={(state: any) => setCurrentTime(state.playedSeconds)}
-                        onDuration={(d: any) => setDuration(d)}
+                        onProgress={(state: { playedSeconds: number }) => setCurrentTime(state.playedSeconds)}
+                        onDuration={(d: number) => setDuration(d)}
                         onEnded={nextSong}
-                        onError={(e: any) => console.error('ReactPlayer Error:', e)}
+                        onError={(e: unknown) => console.error('ReactPlayer Error:', e)}
                         config={{
                             youtube: {
                                 playerVars: { autoplay: 1, controls: 0 }
                             }
-                        } as any}
+                        }}
                     />
                 </div>
             )}

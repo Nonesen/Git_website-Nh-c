@@ -7,8 +7,8 @@ export async function GET() {
         await dbConnect();
         const users = await User.find({}, '-password'); // Don't return passwords
         return NextResponse.json({ success: true, data: users });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }
 
@@ -33,7 +33,7 @@ export async function PATCH(request: Request) {
         }
 
         return NextResponse.json({ success: true, data: user });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }

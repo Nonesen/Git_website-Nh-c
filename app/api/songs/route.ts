@@ -16,8 +16,8 @@ export async function GET() {
             _id: s._id // keep raw id if needed
         }));
         return NextResponse.json({ success: true, data: formattedSongs });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }
 
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
         const song = await Song.create(body);
         return NextResponse.json({ success: true, data: song });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }

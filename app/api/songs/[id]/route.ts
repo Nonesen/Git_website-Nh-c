@@ -19,7 +19,7 @@ export async function DELETE(
         }
 
         return NextResponse.json({ success: true, message: 'Song deleted successfully' });
-    } catch (error: any) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 400 });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }
