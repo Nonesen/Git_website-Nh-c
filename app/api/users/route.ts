@@ -37,3 +37,29 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 400 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        await dbConnect();
+        const url = new URL(request.url);
+        const username = url.searchParams.get('username');
+        
+        if (!username) {
+            return NextResponse.json({ success: false, error: 'Thiếu tên đăng nhập' }, { status: 400 });
+        }
+
+        const userToDelete = await User.findOne({ username });
+        if (!userToDelete) {
+            return NextResponse.json({ success: false, error: 'Không tìm thấy người dùng' }, { status: 404 });
+        }
+
+        if (userToDelete.role === 'admin') {
+            return NextResponse.json({ success: false, error: 'Không thể xóa tài khoản Quản trị viên' }, { status: 403 });
+        }
+
+        await User.deleteOne({ username });
+        return NextResponse.json({ success: true, message: 'Đã xóa tài khoản' });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Lỗi hệ thống' }, { status: 500 });
+    }
+}
