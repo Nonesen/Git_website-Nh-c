@@ -29,6 +29,7 @@ export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
   const [isExploreLoading, setIsExploreLoading] = useState(false);
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -133,8 +134,13 @@ export default function Home() {
     : displaySongs;
 
   return (
-    <div className="app-container">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className={`app-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <Sidebar 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+      />
       
       <main className="content">
         <Header 

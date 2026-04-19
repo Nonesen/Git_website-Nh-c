@@ -8,9 +8,11 @@ import { usePlayer } from '@/context/PlayerContext';
 interface SidebarProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
+    isCollapsed?: boolean;
+    onToggleCollapse?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isCollapsed = false, onToggleCollapse }) => {
     const { t } = useLanguage();
     const { user, isAuthenticated } = useAuth();
     const { playlists, deletePlaylist } = usePlayer();
@@ -27,10 +29,41 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
     ];
 
     return (
-        <aside className="sidebar">
-            <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer', justifyContent: 'center' }}>
-                <i className="fa-solid fa-music"></i>
-                <span>Sonify</span>
+        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+            <div className="sidebar-header" style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px', 
+                padding: '1.2rem 1rem',
+                justifyContent: isCollapsed ? 'center' : 'flex-start'
+            }}>
+                <button 
+                    className="btn-sidebar-toggle" 
+                    onClick={onToggleCollapse}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-main)',
+                        fontSize: '1.4rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        transition: 'var(--transition)'
+                    }}
+                >
+                    <i className="fa-solid fa-bars"></i>
+                </button>
+                
+                {!isCollapsed && (
+                    <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer', padding: 0 }}>
+                        <i className="fa-solid fa-music"></i>
+                        <span>Sonify</span>
+                    </div>
+                )}
             </div>
             
             <nav className="nav-menu">
@@ -42,16 +75,18 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                                 key={item.id}
                                 className={activeTab === item.id ? 'active' : ''}
                                 onClick={() => onTabChange(item.id)}
+                                title={isCollapsed ? (item.label.startsWith('nav-') ? t(item.label) : item.label) : ''}
+                                style={{ justifyContent: isCollapsed ? 'center' : 'flex-start' }}
                             >
                                 <i className={`fa-solid ${item.icon}`}></i>
-                                <span>{item.label.startsWith('nav-') ? t(item.label) : item.label}</span>
+                                {!isCollapsed && <span>{item.label.startsWith('nav-') ? t(item.label) : item.label}</span>}
                             </li>
                         );
                     })}
                 </ul>
             </nav>
 
-            {(!isAdmin && isAuthenticated) && (
+            {(!isAdmin && isAuthenticated && !isCollapsed) && (
                 <div className="playlists">
                     <h3>{t('playlist-title')}</h3>
                     <ul>
@@ -84,30 +119,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                     </ul>
                 </div>
             )}
-
-            <div className="sidebar-footer" style={{ marginTop: 'auto', padding: '10px 0' }}>
-                <button 
-                    className="nav-menu li" 
-                    style={{ 
-                        width: '100%', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '12px', 
-                        padding: '12px 20px', 
-                        borderRadius: '50px', 
-                        background: 'rgba(255,255,255,0.05)', 
-                        border: '1px solid var(--glass-border)',
-                        color: 'var(--text-muted)',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem',
-                        transition: 'all 0.2s'
-                    }}
-                    onClick={() => onTabChange('feedback')}
-                >
-                    <i className="fa-solid fa-circle-info"></i>
-                    <span>Trợ giúp & Góp ý</span>
-                </button>
-            </div>
         </aside>
     );
 };

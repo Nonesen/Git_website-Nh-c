@@ -19,8 +19,9 @@
 
     /* Layout sizing variables */
     --sidebar-width: 240px;
+    --sidebar-collapsed-width: 84px;
     --player-height: 88px;
-    --transition: all 0.2s ease;
+    --transition: all 0.3s ease;
 }
 
 [data-theme='light'] {
@@ -100,9 +101,14 @@ h1, h2, h3, .logo span {
     grid-template-columns: var(--sidebar-width) 1fr;
     grid-template-rows: calc(100vh - var(--player-height)) var(--player-height);
     height: 100vh;
+    transition: grid-template-columns 0.3s ease;
     width: 100vw;
     overflow: hidden;
     position: relative;
+}
+
+.sidebar-collapsed {
+    grid-template-columns: var(--sidebar-collapsed-width) 1fr;
 }
 
 /* ===== SIDEBAR ===== */
@@ -114,9 +120,13 @@ h1, h2, h3, .logo span {
     flex-direction: column;
     gap: 2.8rem;
     border-right: 1px solid var(--glass-border);
-    transition: background 0.3s ease;
+    transition: width 0.3s ease, background 0.3s ease;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
 }
 
 .logo {
@@ -137,7 +147,7 @@ h1, h2, h3, .logo span {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 12px;
 }
 
 .nav-menu li, .playlists li {
@@ -234,14 +244,17 @@ h1, h2, h3, .logo span {
     display: flex;
     align-items: center;
     margin-bottom: 1.5rem;
+    margin-top: 1rem;
     gap: 16px;
     position: sticky;
-    top: 0;
+    top: 1rem;
     z-index: 1000;
-    background: var(--body-bg-fallback);
-    background-image: var(--body-bg);
-    padding: 10px 0;
-    backdrop-filter: blur(10px);
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    padding: 10px 24px;
+    border-radius: 50px;
+    backdrop-filter: blur(25px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Hide duplicate logo in header (sidebar already has it) */
