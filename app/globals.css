@@ -41,21 +41,21 @@
 }
 
 [data-theme='blue'] {
-    --bg-dark: #0b1b3d;
-    --bg-card: rgba(255, 255, 255, 0.08); /* Card hơi trong suốt nhẹ trên nền xanh */
-    --bg-sidebar: #06112a;
-    --text-main: #ffffff;
-    --text-muted: #94b8e6;
-    --accent-glow: rgba(0, 204, 255, 0.3);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --bar-bg: rgba(6, 17, 42, 0.85);
-    --dynamic-bg: #0b1b3d;
-    --body-bg: linear-gradient(135deg, #0e2a5f 0%, #06112a 100%);
-    --primary-color: #00ccff;
-    --primary-light: #66d9ff;
-    --btn-main-bg: #00ccff;
-    --btn-main-text: #040d21;
-    --cyan-accent: #00ffff;
+    --bg-dark: #000000;
+    --bg-card: rgba(5, 10, 20, 0.85);
+    --bg-sidebar: #020610;
+    --text-main: #33ccff;
+    --text-muted: #0088cc;
+    --accent-glow: rgba(51, 204, 255, 0.25);
+    --glass-border: rgba(51, 204, 255, 0.2);
+    --bar-bg: rgba(0, 0, 0, 0.85);
+    --dynamic-bg: #000000;
+    --body-bg: radial-gradient(circle at 20% 20%, #051525 0%, #000000 100%);
+    --primary-color: #00bfff;
+    --primary-light: #80dfff;
+    --btn-main-bg: rgba(0, 191, 255, 0.15);
+    --btn-main-text: #33ccff;
+    --cyan-accent: #00aaff;
 }
 
 *, *::before, *::after {
