@@ -32,7 +32,7 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentBanner(prev => (prev + 1) % 2);
+      setCurrentBanner(prev => (prev + 1) % 4);
     }, 5000);
     return () => clearInterval(timer);
   }, []);
@@ -69,19 +69,24 @@ export default function Home() {
     }
   }, [searchQuery, fetchOnline]);
 
-  // Handle Trending Songs for Explore tab
+  // Handle Trending Songs for banners and Explore tab
   useEffect(() => {
-    if (activeTab === 'explore' && trendingSongs.length === 0) {
+    if (trendingSongs.length === 0) {
       const fetchTrending = async () => {
         setIsExploreLoading(true);
-        const { getTrendingSongs } = await import('@/services/musicService');
-        const results = await getTrendingSongs();
-        setTrendingSongs(results);
-        setIsExploreLoading(false);
+        try {
+          const { getTrendingSongs } = await import('@/services/musicService');
+          const results = await getTrendingSongs();
+          setTrendingSongs(results);
+        } catch (error) {
+          console.error("Failed to fetch trending songs:", error);
+        } finally {
+          setIsExploreLoading(false);
+        }
       };
       fetchTrending();
     }
-  }, [activeTab, trendingSongs.length]);
+  }, [trendingSongs.length]);
 
   // Load recently played from localStorage
   useEffect(() => {
@@ -139,45 +144,133 @@ export default function Home() {
           onSearch={(query) => setSearchQuery(query)}
         />
 
-        {activeTab === 'home' && !searchQuery.trim() && (
-          <section 
-            className="hero-section hero-banner" 
-            style={{ 
-              backgroundImage: currentBanner === 0 
-                ? 'url(/img/banner_boat.png)' 
-                : 'url(/img/banner_sunset.png)', 
-              backgroundSize: 'cover', 
-              backgroundPosition: 'center',
-              transition: 'background-image 0.5s ease-in-out',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: currentBanner === 0 ? 'flex-start' : 'flex-end',
-              textAlign: currentBanner === 1 ? 'right' : 'left',
-              minHeight: '140px',
-              position: 'relative'
-            }}
-          >
-            <div className="hero-content" style={{ 
-               background: currentBanner === 0 ? 'rgba(0,30,60,0.5)' : 'rgba(80,30,10,0.4)', 
-               padding: '0.8rem 1.2rem', 
-               borderRadius: '12px',
-               backdropFilter: 'blur(3px)',
-               maxWidth: '50%',
-               border: '1px solid rgba(255,255,255,0.1)'
-            }}>
-              <h1 style={{ 
-                  whiteSpace: 'pre-line', 
-                  fontSize: '1.4rem', 
-                  color: currentBanner === 0 ? '#e0f2fe' : '#ffedd5',
-                  textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                  marginBottom: '4px',
-                  lineHeight: '1.2'
+        {activeTab === 'home' && !searchQuery.trim() && (() => {
+          const banners = [
+            { 
+              img: '/img/banner_boat.png', 
+              text: "Gói ghém\nBình yên", 
+              color: '#e0f2fe', 
+              bg: 'rgba(0,30,60,0.5)', 
+              align: 'flex-start', 
+              textAlign: 'left' 
+            },
+            { 
+              img: '/img/banner_sunset.png', 
+              text: "Story hôm nay\nup bài gì?", 
+              color: '#ffedd5', 
+              bg: 'rgba(80,30,10,0.4)', 
+              align: 'flex-end', 
+              textAlign: 'right' 
+            },
+            { 
+              img: '/img/banner_hot.png', 
+              text: "Bảng Xếp Hạng\nHot Trong Tuần", 
+              color: '#fdf2f2', 
+              bg: 'rgba(100,0,50,0.4)', 
+              align: 'center', 
+              textAlign: 'center',
+              featured: trendingSongs.length > 0 ? trendingSongs.slice(0, 3) : null
+            },
+            { 
+              img: '/img/banner_top.png', 
+              text: "Những Bài Hát\nNghe Nhiều Nhất", 
+              color: '#f0f9ff', 
+              bg: 'rgba(0,50,100,0.4)', 
+              align: 'flex-start', 
+              textAlign: 'left',
+              featured: trendingSongs.length > 3 ? trendingSongs.slice(3, 6) : null
+            }
+          ];
+          const banner = (banners as any)[currentBanner] || banners[0];
+          
+          return (
+            <section 
+              className="hero-section hero-banner" 
+              style={{ 
+                backgroundImage: `url(${banner.img})`, 
+                backgroundSize: 'cover', 
+                backgroundPosition: 'center',
+                transition: 'background-image 0.5s ease-in-out',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: (banner as any).featured ? 'space-between' : banner.align as any,
+                textAlign: banner.textAlign as any,
+                minHeight: '180px',
+                position: 'relative',
+                padding: '1.5rem 2.5rem',
+                gap: '2rem'
+              }}
+            >
+              <div className="hero-content" style={{ 
+                background: banner.bg, 
+                padding: '1rem 1.5rem', 
+                borderRadius: '16px',
+                backdropFilter: 'blur(8px)',
+                maxWidth: (banner as any).featured ? '45%' : '55%',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
               }}>
-                 {currentBanner === 0 ? "Gói Ghém\nBình Yên" : "Story hôm nay\nup bài gì?"}
-              </h1>
-            </div>
-          </section>
-        )}
+                <h1 style={{ 
+                    whiteSpace: 'pre-line', 
+                    fontSize: '1.6rem', 
+                    color: banner.color,
+                    textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                    marginBottom: '4px',
+                    lineHeight: '1.2'
+                }}>
+                  {banner.text}
+                </h1>
+              </div>
+
+              {(banner as any).featured && (
+                <div className="banner-featured-list" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  padding: '12px',
+                  borderRadius: '16px',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  minWidth: '260px',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+                }}>
+                  {(banner as any).featured ? (banner as any).featured.map((song: any, idx: number) => (
+                    <div key={song.id} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '8px 12px',
+                      borderRadius: '10px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      transition: 'transform 0.2s',
+                      cursor: 'pointer'
+                    }}>
+                      <span style={{ color: banner.color, fontWeight: 'bold', fontSize: '0.9rem', width: '20px' }}>{idx + 1}</span>
+                      <img src={song.cover} alt="" style={{ width: '42px', height: '42px', borderRadius: '8px', objectFit: 'cover' }} />
+                      <div style={{ textAlign: 'left', overflow: 'hidden' }}>
+                        <div style={{ color: 'white', fontSize: '0.9rem', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</div>
+                        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem' }}>{song.artist}</div>
+                      </div>
+                    </div>
+                  )) : (
+                    // Loading skeleton
+                    [1,2,3].map(i => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 12px', opacity: 0.5 }}>
+                         <div style={{ width: '20px', height: '20px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }} />
+                         <div style={{ width: '42px', height: '42px', background: 'rgba(255,255,255,0.1)', borderRadius: '8px' }} />
+                         <div style={{ flex: 1 }}>
+                            <div style={{ height: '14px', width: '100px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', marginBottom: '6px' }} />
+                            <div style={{ height: '10px', width: '60px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }} />
+                         </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </section>
+          );
+        })()}
 
         {isAdminTab ? (
           <AdminPanel view={activeTab.split('-')[1] as 'music' | 'users' | 'stats'} />
