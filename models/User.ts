@@ -4,6 +4,7 @@ export interface IUser extends Document {
     username: string;
     password?: string; // Hashed password
     name: string;
+    phoneNumber?: string;
     role: 'admin' | 'user';
     likedSongs: string[]; // Store Song IDs or custom ID strings
     playlists: { id: string, name: string, songIds: string[] }[];
@@ -14,6 +15,7 @@ const UserSchema: Schema = new Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String, required: true },
+    phoneNumber: { type: String },
     role: { type: String, enum: ['admin', 'user'], default: 'user' },
     likedSongs: [{ type: String }],
     playlists: [{

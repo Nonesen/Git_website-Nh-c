@@ -13,20 +13,77 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     const { login } = useAuth();
     const { t } = useLanguage();
     
-    const [view, setView] = useState<'login' | 'signup'>('login');
+    const [view, setView] = useState<'login' | 'signup' | 'forgot-password'>('login');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [authKey, setAuthKey] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
+
+    const switchView = (newView: 'login' | 'signup' | 'forgot-password') => {
+        setView(newView);
+        setError('');
+        setSuccessMsg('');
+    };
 
     if (!isOpen) return null;
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+        setSuccessMsg('');
         const result = await login(username, password);
         if (result.success) {
             onClose();
         } else {
             setError(result.message || 'Sai tên đăng nhập hoặc mật khẩu!');
+        }
+    };
+
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, name, phoneNumber })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setSuccessMsg('Đăng ký thành công! Hãy đăng nhập.');
+                setTimeout(() => switchView('login'), 2000);
+            } else {
+                setError(data.message || 'Đăng ký thất bại!');
+            }
+        } catch (err) {
+            setError('Lỗi hệ thống');
+        }
+    };
+
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setSuccessMsg('');
+        try {
+            const res = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, authKey, newPassword })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setSuccessMsg('Đổi mật khẩu thành công! Hãy đăng nhập.');
+                setTimeout(() => switchView('login'), 2000);
+            } else {
+                setError(data.message || 'Đổi mật khẩu thất bại!');
+            }
+        } catch (err) {
+            setError('Lỗi hệ thống');
         }
     };
 
@@ -41,6 +98,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                             <h2>{t('header-login')}</h2>
                         </div>
                         {error && <p style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</p>}
+                        {successMsg && <p style={{ color: '#22c55e', marginBottom: '1rem', fontSize: '0.85rem' }}>{successMsg}</p>}
                         <form onSubmit={handleLogin}>
                             <div className="form-group">
                                 <input 
@@ -66,30 +124,59 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                                     <span className="checkmark"></span>
                                     Nhớ cho lần đăng nhập tới
                                 </label>
-                                <a href="#" className="forgot-link">Quên mật khẩu?</a>
+                                <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); switchView('forgot-password'); }}>Quên mật khẩu?</a>
                             </div>
 
                             <button type="submit" className="btn-auth-submit">Đăng nhập</button>
-                            <p className="auth-switch">Chưa có tài khoản? <span onClick={() => setView('signup')}>Đăng ký ngay</span></p>
+                            <p className="auth-switch">Chưa có tài khoản? <span onClick={() => switchView('signup')}>Đăng ký ngay</span></p>
                         </form>
                     </div>
-                ) : (
+                ) : view === 'signup' ? (
                     <div id="signup-form">
                         <div className="auth-header">
                             <h2>Đăng ký tài khoản</h2>
                         </div>
-                        <div className="form-group">
-                            <input type="text" placeholder="Họ và tên của bạn" />
+                        {error && <p style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</p>}
+                        {successMsg && <p style={{ color: '#22c55e', marginBottom: '1rem', fontSize: '0.85rem' }}>{successMsg}</p>}
+                        <form onSubmit={handleRegister}>
+                            <div className="form-group">
+                                <input type="text" placeholder="Họ và tên của bạn" value={name} onChange={(e) => setName(e.target.value)} required />
+                            </div>
+                            <div className="form-group">
+                                <input type="text" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                            </div>
+                            <div className="form-group">
+                                <input type="text" placeholder="Số điện thoại" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+                            </div>
+                            <div className="form-group password-group">
+                                <input type="password" placeholder="Mật khẩu của bạn" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                <i className="fa-regular fa-eye-slash toggle-password"></i>
+                            </div>
+                            <button type="submit" className="btn-auth-submit">Đăng ký</button>
+                            <p className="auth-switch">Đã có tài khoản? <span onClick={() => switchView('login')}>Đăng nhập</span></p>
+                        </form>
+                    </div>
+                ) : (
+                    <div id="forgot-password-form">
+                        <div className="auth-header">
+                            <h2>Đổi Mật Khẩu</h2>
                         </div>
-                        <div className="form-group">
-                            <input type="text" placeholder="Tên đăng nhập" />
-                        </div>
-                        <div className="form-group password-group">
-                            <input type="password" placeholder="Mật khẩu của bạn" />
-                            <i className="fa-regular fa-eye-slash toggle-password"></i>
-                        </div>
-                        <button className="btn-auth-submit">Đăng ký</button>
-                        <p className="auth-switch">Đã có tài khoản? <span onClick={() => setView('login')}>Đăng nhập</span></p>
+                        {error && <p style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</p>}
+                        {successMsg && <p style={{ color: '#22c55e', marginBottom: '1rem', fontSize: '0.85rem' }}>{successMsg}</p>}
+                        <form onSubmit={handleResetPassword}>
+                            <div className="form-group">
+                                <input type="text" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                            </div>
+                            <div className="form-group">
+                                <input type="text" placeholder="Số điện thoại / Mật khẩu tạm (123)" value={authKey} onChange={(e) => setAuthKey(e.target.value)} required />
+                            </div>
+                            <div className="form-group password-group">
+                                <input type="password" placeholder="Mật khẩu mới" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                                <i className="fa-regular fa-eye-slash toggle-password"></i>
+                            </div>
+                            <button type="submit" className="btn-auth-submit">Xác nhận đổi</button>
+                            <p className="auth-switch">Quay lại <span onClick={() => switchView('login')}>Đăng nhập</span></p>
+                        </form>
                     </div>
                 )}
 
