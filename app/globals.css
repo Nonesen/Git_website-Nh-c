@@ -41,21 +41,21 @@
 }
 
 [data-theme='blue'] {
-    --bg-dark: #ccf2ff;
-    --bg-card: rgba(255, 255, 255, 0.4);
-    --bg-sidebar: #b3ecff;
-    --text-main: #004d66;
-    --text-muted: #006080;
-    --accent-glow: rgba(0, 153, 204, 0.3);
-    --glass-border: rgba(0, 115, 153, 0.2);
-    --bar-bg: rgba(0, 115, 153, 0.15);
-    --dynamic-bg: #b3ecff;
-    --body-bg: linear-gradient(135deg, #80dfff 0%, #ccf2ff 100%);
-    --primary-color: #0099cc;
-    --primary-light: #33ccff;
-    --btn-main-bg: #004d66;
-    --btn-main-text: #ffffff;
-    --cyan-accent: #007799;
+    --bg-dark: #0b1b3d;
+    --bg-card: rgba(255, 255, 255, 0.08); /* Card hơi trong suốt nhẹ trên nền xanh */
+    --bg-sidebar: #06112a;
+    --text-main: #ffffff;
+    --text-muted: #94b8e6;
+    --accent-glow: rgba(0, 204, 255, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --bar-bg: rgba(6, 17, 42, 0.85);
+    --dynamic-bg: #0b1b3d;
+    --body-bg: linear-gradient(135deg, #0e2a5f 0%, #06112a 100%);
+    --primary-color: #00ccff;
+    --primary-light: #66d9ff;
+    --btn-main-bg: #00ccff;
+    --btn-main-text: #040d21;
+    --cyan-accent: #00ffff;
 }
 
 *, *::before, *::after {
