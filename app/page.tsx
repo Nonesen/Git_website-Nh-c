@@ -155,7 +155,7 @@ export default function Home() {
               textAlign: 'left' 
             },
             { 
-              img: '/img/banner_sunset.png', 
+              img: '/img/banner_house.png', 
               text: "Story hôm nay up bài gì?", 
               color: '#ffedd5', 
               bg: 'rgba(80,30,10,0.4)', 
@@ -163,19 +163,19 @@ export default function Home() {
               textAlign: 'right' 
             },
             { 
-              img: '/img/banner_hot.png', 
+              img: '/img/banner_boat.png', 
               text: "Bảng Xếp Hạng\nHot Trong Tuần", 
               color: '#fdf2f2', 
-              bg: 'rgba(100,0,50,0.4)', 
+              bg: 'rgba(10,30,60,0.5)', 
               align: 'center', 
               textAlign: 'center',
               featured: trendingSongs.length > 0 ? trendingSongs.slice(0, 3) : null
             },
             { 
-              img: '/img/banner_top.png', 
+              img: '/img/banner_sunset.png', 
               text: "Những Bài Hát\nNghe Nhiều Nhất", 
               color: '#f0f9ff', 
-              bg: 'rgba(0,50,100,0.4)', 
+              bg: 'rgba(40,20,10,0.5)', 
               align: 'flex-start', 
               textAlign: 'left',
               featured: trendingSongs.length > 3 ? trendingSongs.slice(3, 6) : null
@@ -195,7 +195,8 @@ export default function Home() {
                 alignItems: 'center',
                 justifyContent: (banner as any).featured ? 'space-between' : banner.align as any,
                 textAlign: banner.textAlign as any,
-                minHeight: '220px',
+                height: '240px',
+                minHeight: '240px',
                 position: 'relative',
                 padding: '2rem 3rem',
                 gap: '2rem'
