@@ -177,6 +177,6 @@ export const translations = {
 };
 
 export const initialUsers = [
-    { username: 'admin', password: '1234', name: 'Quản trị viên', role: 'admin' },
+    { username: 'admin', password: '123', name: 'Quản trị viên', role: 'admin' },
     { username: 'user', password: '123', name: 'người dùng', role: 'user' }
 ];
