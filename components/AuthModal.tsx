@@ -35,7 +35,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         setUserRole(null);
         setAuthKey('');
         setNewPassword('');
+        setShowPassword(false);
+        setShowNewPassword(false);
     };
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
 
     if (!isOpen) return null;
 
@@ -142,12 +147,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                             </div>
                             <div className="form-group password-group">
                                 <input 
-                                    type="password" 
+                                    type={showPassword ? 'text' : 'password'}
                                     placeholder="Nhập mật khẩu" 
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
-                                <i className="fa-regular fa-eye-slash toggle-password"></i>
+                                <i className={`fa-regular ${showPassword ? 'fa-eye' : 'fa-eye-slash'} toggle-password`} onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}></i>
                             </div>
                             
                             <div className="auth-options">
@@ -181,8 +186,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                                 <input type="text" placeholder="Số điện thoại" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
                             </div>
                             <div className="form-group password-group">
-                                <input type="password" placeholder="Mật khẩu của bạn" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                                <i className="fa-regular fa-eye-slash toggle-password"></i>
+                                <input type={showPassword ? 'text' : 'password'} placeholder="Mật khẩu của bạn" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                <i className={`fa-regular ${showPassword ? 'fa-eye' : 'fa-eye-slash'} toggle-password`} onClick={() => setShowPassword(!showPassword)} style={{ cursor: 'pointer' }}></i>
                             </div>
                             <button type="submit" className="btn-auth-submit">Đăng ký</button>
                             <p className="auth-switch">Đã có tài khoản? <span onClick={() => switchView('login')}>Đăng nhập</span></p>
@@ -229,8 +234,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                                     />
                                 </div>
                                 <div className="form-group password-group">
-                                    <input type="password" placeholder="Mật khẩu mới" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-                                    <i className="fa-regular fa-eye-slash toggle-password"></i>
+                                    <input type={showNewPassword ? 'text' : 'password'} placeholder="Mật khẩu mới" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                                    <i className={`fa-regular ${showNewPassword ? 'fa-eye' : 'fa-eye-slash'} toggle-password`} onClick={() => setShowNewPassword(!showNewPassword)} style={{ cursor: 'pointer' }}></i>
                                 </div>
                                 <button type="submit" className="btn-auth-submit">Xác nhận đổi</button>
                                 <p className="auth-switch">
