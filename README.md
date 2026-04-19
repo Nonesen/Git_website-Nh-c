@@ -89,14 +89,3 @@ Sonify/
 └── data/
     └── constants.ts     # Dữ liệu bài hát + bản dịch
 ```
-
----
-
-## 🔄 Deployment
-
-Dự án được tự động deploy lên **Vercel** mỗi khi có push lên nhánh `main`.  
-Không cần thao tác thủ công — commit & push là website cập nhật ngay.
-
-```
-main branch → Vercel auto-build → Live in ~30s
-```
