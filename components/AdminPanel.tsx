@@ -19,7 +19,7 @@ interface Feedback {
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
     const { user } = useAuth();
-    const { allSongs } = usePlayer();
+    const { allSongs, refreshSongs } = usePlayer();
     const [isAdding, setIsAdding] = useState(false);
     const [newSong, setNewSong] = useState<Partial<Song>>({
         title: '', artist: '', cover: '/img/', src: '/sound/'
@@ -82,8 +82,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                 alert('Bài hát đã được lưu vào cơ sở dữ liệu!');
                 setIsAdding(false);
                 setNewSong({ title: '', artist: '', cover: '/img/', src: '/sound/' });
-                // Note: The PlayerContext will need to be told to refresh
-                window.location.reload(); 
+                await refreshSongs();
             }
         } catch (error) {
             console.error('Error saving song:', error);
@@ -327,7 +326,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                                                                     const data = await res.json();
                                                                     if (data.success) {
                                                                         alert('Đã xóa bài hát!');
-                                                                        window.location.reload();
+                                                                        await refreshSongs();
                                                                     }
                                                                 } catch (err) {
                                                                     console.error('Lỗi khi xóa nhạc:', err);

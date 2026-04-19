@@ -33,6 +33,7 @@ interface PlayerContextType {
     queue: Song[];
     allSongs: Song[];
     addToNextUp: (song: Song) => void;
+    refreshSongs: () => Promise<void>;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -337,13 +338,25 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setQueue(prev => [song, ...prev]);
     };
 
+    const refreshSongs = async () => {
+        try {
+            const response = await fetch('/api/songs');
+            const data = await response.json();
+            if (data.success) {
+                setAllSongs(data.data);
+            }
+        } catch (error) {
+            console.error('Failed to refresh songs:', error);
+        }
+    };
+
     return (
         <PlayerContext.Provider value={{
             currentSong, isPlaying, duration, currentTime, volume, isShuffle, isRepeat,
             playSong, togglePlay, nextSong, prevSong, seek, setVolume, toggleShuffle, toggleRepeat,
             likedSongs, toggleLike,
             playlists, createPlaylist, deletePlaylist, addToPlaylist, removeFromPlaylist, createAndAddToPlaylist,
-            queue, allSongs, addToNextUp
+            queue, allSongs, addToNextUp, refreshSongs
         }}>
             {children}
             {/* Hidden ReactPlayer for YouTube Audio */}
