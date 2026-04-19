@@ -141,38 +141,15 @@ export default function Home() {
 
         {activeTab === 'home' && !searchQuery.trim() && (
           <section 
-            className="hero-section hero-banner" 
+            className={`hero-section hero-banner banner-${currentBanner}`} 
             style={{ 
               backgroundImage: currentBanner === 0 
                 ? 'url(/img/banner_boat.png)' 
-                : 'url(/img/banner_sunset.png)', 
-              backgroundSize: 'cover', 
-              backgroundPosition: 'center',
-              transition: 'background-image 0.5s ease-in-out',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: currentBanner === 0 ? 'flex-start' : 'flex-end',
-              textAlign: currentBanner === 1 ? 'right' : 'left',
-              minHeight: '160px',
-              position: 'relative'
+                : 'url(/img/banner_sunset.png)'
             }}
           >
-            <div className="hero-content" style={{ 
-               background: currentBanner === 0 ? 'rgba(0,30,60,0.5)' : 'rgba(80,30,10,0.4)', 
-               padding: '1rem 1.5rem', 
-               borderRadius: '14px',
-               backdropFilter: 'blur(3px)',
-               maxWidth: '50%',
-               border: '1px solid rgba(255,255,255,0.1)'
-            }}>
-              <h1 style={{ 
-                  whiteSpace: 'pre-line', 
-                  fontSize: '1.6rem', 
-                  color: currentBanner === 0 ? '#e0f2fe' : '#ffedd5',
-                  textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                  marginBottom: '4px',
-                  lineHeight: '1.3'
-              }}>
+            <div className="hero-content">
+              <h1>
                  {currentBanner === 0 ? "Gói Ghém\nBình Yên" : "Story hôm nay\nup bài gì?"}
               </h1>
             </div>
