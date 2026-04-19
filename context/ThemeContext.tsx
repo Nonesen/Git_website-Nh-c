@@ -15,7 +15,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setThemeState] = useState<Theme>('dark'); // Default to dark as per original design
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem('vibraze_theme') as Theme;
+        const savedTheme = localStorage.getItem('sonify_theme') as Theme;
         if (savedTheme) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setThemeState(savedTheme);
@@ -33,7 +33,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
 
         root.setAttribute('data-theme', actualTheme);
-        localStorage.setItem('vibraze_theme', theme);
+        localStorage.setItem('sonify_theme', theme);
     }, [theme]);
 
     const setTheme = (t: Theme) => {

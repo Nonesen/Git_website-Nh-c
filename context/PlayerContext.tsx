@@ -76,17 +76,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
         // If not authenticated, load from local storage
         if (!isAuthenticated) {
-            const savedLikes = localStorage.getItem('vibraze_likes');
+            const savedLikes = localStorage.getItem('sonify_likes');
             if (savedLikes) setLikedSongs(JSON.parse(savedLikes));
             
-            const savedPlaylists = localStorage.getItem('vibraze_playlists');
+            const savedPlaylists = localStorage.getItem('sonify_playlists');
             if (savedPlaylists) {
                 const parsed = JSON.parse(savedPlaylists);
                 setPlaylists(parsed.filter((p: { id: string }) => p.id !== 'p-1' && p.id !== 'p-2'));
             }
         }
 
-        const savedVol = localStorage.getItem('vibraze_volume');
+        const savedVol = localStorage.getItem('sonify_volume');
         if (savedVol) {
             const v = parseFloat(savedVol);
             if (!isNaN(v) && v >= 0 && v <= 1) setVolumeState(v);
@@ -177,10 +177,10 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
                 }
             }
             
-            const recent = JSON.parse(localStorage.getItem('vibraze_recent') || '[]');
+            const recent = JSON.parse(localStorage.getItem('sonify_recent') || '[]');
             const updated = [song.id, ...recent.filter((id: string | number) => id !== song.id)].slice(0, 20);
-            localStorage.setItem('vibraze_recent', JSON.stringify(updated));
-            window.dispatchEvent(new Event('vibraze_recent_updated'));
+            localStorage.setItem('sonify_recent', JSON.stringify(updated));
+            window.dispatchEvent(new Event('sonify_recent_updated'));
         } catch (error) {
             console.warn("Playback interrupted", error);
         }
@@ -275,7 +275,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const setVolume = (v: number) => {
         if (audioRef.current) audioRef.current.volume = v;
         setVolumeState(v);
-        localStorage.setItem('vibraze_volume', v.toString());
+        localStorage.setItem('sonify_volume', v.toString());
     };
 
     const toggleShuffle = () => setIsShuffle(!isShuffle);
@@ -285,8 +285,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         setLikedSongs((prev) => {
             const isLiked = prev.includes(songId);
             const newLikes = isLiked ? prev.filter((id) => id !== songId) : [...prev, songId];
-            localStorage.setItem('vibraze_likes', JSON.stringify(newLikes));
-            window.dispatchEvent(new Event('vibraze_likes_updated'));
+            localStorage.setItem('sonify_likes', JSON.stringify(newLikes));
+            window.dispatchEvent(new Event('sonify_likes_updated'));
             return newLikes;
         });
     };
@@ -295,20 +295,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         const newPlaylist = { id: `p-${Date.now()}`, name, songIds: [] };
         const updated = [...playlists, newPlaylist];
         setPlaylists(updated);
-        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+        localStorage.setItem('sonify_playlists', JSON.stringify(updated));
     };
 
     const createAndAddToPlaylist = (name: string, songId: number | string) => {
         const newPlaylist = { id: `p-${Date.now()}`, name, songIds: [songId] };
         const updated = [...playlists, newPlaylist];
         setPlaylists(updated);
-        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+        localStorage.setItem('sonify_playlists', JSON.stringify(updated));
     };
 
     const deletePlaylist = (id: string) => {
         const updated = playlists.filter(p => p.id !== id);
         setPlaylists(updated);
-        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+        localStorage.setItem('sonify_playlists', JSON.stringify(updated));
     };
 
     const addToPlaylist = (playlistId: string, songId: number | string) => {
@@ -319,7 +319,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             return p;
         });
         setPlaylists(updated);
-        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+        localStorage.setItem('sonify_playlists', JSON.stringify(updated));
     };
 
     const removeFromPlaylist = (playlistId: string, songId: number | string) => {
@@ -330,7 +330,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
             return p;
         });
         setPlaylists(updated);
-        localStorage.setItem('vibraze_playlists', JSON.stringify(updated));
+        localStorage.setItem('sonify_playlists', JSON.stringify(updated));
     };
 
     const addToNextUp = (song: Song) => {

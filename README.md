@@ -1,4 +1,4 @@
-# 🎵 Vibraze — Premium Music Experience
+# 🎵 Sonify — Premium Music Experience
 
 <div align="center">
   <img src="https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js" />
@@ -13,7 +13,7 @@
 
 ## 🔗 Live Demo
 
-**[▶ Mở Vibraze trực tuyến](https://git-website-nh-c.vercel.app)**
+**[▶ Mở Sonify trực tuyến](https://git-website-nh-c.vercel.app)**
 
 ---
 
@@ -65,7 +65,7 @@ MONGODB_URI=mongodb://mongo:<password>@<host>:<port>
 ## 📁 Cấu trúc dự án
 
 ```
-Vibraze/
+Sonify/
 ├── app/
 │   ├── layout.tsx       # Root layout + Providers
 │   ├── page.tsx         # Main page

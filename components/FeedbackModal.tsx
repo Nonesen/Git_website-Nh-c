@@ -43,7 +43,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose }) => {
                 body: JSON.stringify({
                     email: userEmail,
                     message: message,
-                    _subject: `Vibraze - Phản hồi mới từ ${userEmail}`,
+                    _subject: `Sonify - Phản hồi mới từ ${userEmail}`,
                     _template: 'table' 
                 })
             });

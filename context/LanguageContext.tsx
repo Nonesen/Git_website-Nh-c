@@ -17,7 +17,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const [language, setLanguageState] = useState<Language>('vi');
 
     useEffect(() => {
-        const savedLang = localStorage.getItem('vibraze_lang') as Language;
+        const savedLang = localStorage.getItem('sonify_lang') as Language;
         if (savedLang && (savedLang === 'vi' || savedLang === 'en')) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setLanguageState(savedLang);
@@ -26,7 +26,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     const setLanguage = (lang: Language) => {
         setLanguageState(lang);
-        localStorage.setItem('vibraze_lang', lang);
+        localStorage.setItem('sonify_lang', lang);
     };
 
     const t = (key: string): string => {

@@ -1,6 +1,6 @@
-# Vibraze - Premium Music Player
+# Sonify - Premium Music Player
 
-Vibraze là một ứng dụng nghe nhạc trực tuyến được thiết kế với giao diện hiện đại, tối giản và hiệu ứng Glassmorphism bắt mắt.
+Sonify là một ứng dụng nghe nhạc trực tuyến được thiết kế với giao diện hiện đại, tối giản và hiệu ứng Glassmorphism bắt mắt.
 
 ## ✨ Tính năng nổi bật
 - **Trình phát nhạc đầy đủ**: Phát, tạm dừng, chuyển bài, quay lại.

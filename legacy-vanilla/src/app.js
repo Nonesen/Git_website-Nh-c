@@ -19,8 +19,8 @@ let musicTbody, userTbody, logsTbody, adminMusicTable, adminUserTable, adminLogs
 let statVisitors, statTotalSongs, statTotalUsers, statTotalListens;
 
 let playerEngine;
-let currentLang = localStorage.getItem('vibraze_lang') || 'vi';
-let likedSongs = JSON.parse(localStorage.getItem('vibraze_likes')) || [];
+let currentLang = localStorage.getItem('sonify_lang') || 'vi';
+let likedSongs = JSON.parse(localStorage.getItem('sonify_likes')) || [];
 
 function init() {
     // 1. Select Elements
@@ -115,13 +115,13 @@ function init() {
 
     // 2. Initialize Engines
     playerEngine = player.initPlayer(audio, playPauseBtn, progressFilled, statTotalListens);
-    if (!localStorage.getItem('vibraze_users')) {
-        localStorage.setItem('vibraze_users', JSON.stringify(initialUsers));
+    if (!localStorage.getItem('sonify_users')) {
+        localStorage.setItem('sonify_users', JSON.stringify(initialUsers));
         auth.setUsers(initialUsers);
     }
     
     // Quick migration for the demo user name change
-    const storedUsers = JSON.parse(localStorage.getItem('vibraze_users'));
+    const storedUsers = JSON.parse(localStorage.getItem('sonify_users'));
     if (storedUsers) {
         let changed = false;
         storedUsers.forEach(u => {
@@ -131,12 +131,12 @@ function init() {
             }
         });
         if (changed) {
-            localStorage.setItem('vibraze_users', JSON.stringify(storedUsers));
+            localStorage.setItem('sonify_users', JSON.stringify(storedUsers));
             auth.setUsers(storedUsers);
-            const session = JSON.parse(sessionStorage.getItem('vibraze_session'));
+            const session = JSON.parse(sessionStorage.getItem('sonify_session'));
             if (session && session.username === 'user') {
                 session.name = 'người dùng';
-                sessionStorage.setItem('vibraze_session', JSON.stringify(session));
+                sessionStorage.setItem('sonify_session', JSON.stringify(session));
             }
         }
     }
@@ -238,7 +238,7 @@ function init() {
         loadSong(s); 
         playerEngine.playSong(); 
     });
-    const savedUser = JSON.parse(sessionStorage.getItem('vibraze_session'));
+    const savedUser = JSON.parse(sessionStorage.getItem('sonify_session'));
     ui.updateGreeting(greetingText, currentLang, savedUser ? savedUser.name : "");
     loadSong(songs[0]);
     checkAuth();
@@ -260,9 +260,9 @@ function loadSong(song) {
     if (player.isPlaying && !audio.paused) stats.recordListen(statTotalListens);
     
     // Recently Played Logic
-    let recent = JSON.parse(localStorage.getItem('vibraze_recent')) || [];
+    let recent = JSON.parse(localStorage.getItem('sonify_recent')) || [];
     recent = [song.id, ...recent.filter(id => id !== song.id)].slice(0, 20);
-    localStorage.setItem('vibraze_recent', JSON.stringify(recent));
+    localStorage.setItem('sonify_recent', JSON.stringify(recent));
 
     playerTitle.textContent = song.title;
     playerArtist.textContent = song.artist;
@@ -308,7 +308,7 @@ function switchTab(btn, tab) {
         let list;
         if (tab === 'liked') list = songs.filter(s => likedSongs.includes(s.id));
         else if (tab === 'recent') {
-            const recentIds = JSON.parse(localStorage.getItem('vibraze_recent')) || [];
+            const recentIds = JSON.parse(localStorage.getItem('sonify_recent')) || [];
             list = recentIds.map(id => songs.find(s => s.id === id)).filter(Boolean);
         } else if (tab === 'explore') list = [...songs].sort(() => 0.5 - Math.random());
         else list = songs;
@@ -368,10 +368,10 @@ function updateSidebarForRole(role) {
     }
 }
 
-function handleLogout() { sessionStorage.removeItem('vibraze_session'); location.reload(); }
+function handleLogout() { sessionStorage.removeItem('sonify_session'); location.reload(); }
 
 function checkAuth() {
-    const savedUser = JSON.parse(sessionStorage.getItem('vibraze_session'));
+    const savedUser = JSON.parse(sessionStorage.getItem('sonify_session'));
     if (savedUser) loginUser(savedUser);
     else { headerGuest.style.display = 'flex'; userProfileTrigger.style.display = 'none'; }
 }
@@ -384,7 +384,7 @@ function handleSearch(e) {
 
 function setLanguage(lang) {
     currentLang = lang;
-    localStorage.setItem('vibraze_lang', lang);
+    localStorage.setItem('sonify_lang', lang);
     document.documentElement.lang = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -396,14 +396,14 @@ function setLanguage(lang) {
         o.classList.toggle('active', isActive);
         o.querySelector('.check-icon').style.display = isActive ? 'inline-block' : 'none';
     });
-    const savedUser = JSON.parse(sessionStorage.getItem('vibraze_session'));
+    const savedUser = JSON.parse(sessionStorage.getItem('sonify_session'));
     ui.updateGreeting(greetingText, lang, savedUser ? savedUser.name : "");
 }
 
 function toggleLike() {
     const id = songs[player.currentSongIndex].id, idx = likedSongs.indexOf(id);
     idx > -1 ? likedSongs.splice(idx, 1) : likedSongs.push(id);
-    localStorage.setItem('vibraze_likes', JSON.stringify(likedSongs));
+    localStorage.setItem('sonify_likes', JSON.stringify(likedSongs));
     updateLikeButton();
 }
 

@@ -1,18 +1,18 @@
-export let loginLogs = JSON.parse(localStorage.getItem('vibraze_login_logs')) || [];
-export let totalVisitors = parseInt(localStorage.getItem('vibraze_visitor_count')) || 0;
-export let totalListens = parseInt(localStorage.getItem('vibraze_listen_count')) || 0;
+export let loginLogs = JSON.parse(localStorage.getItem('sonify_login_logs')) || [];
+export let totalVisitors = parseInt(localStorage.getItem('sonify_visitor_count')) || 0;
+export let totalListens = parseInt(localStorage.getItem('sonify_listen_count')) || 0;
 
 export function recordVisit() {
-    if (!sessionStorage.getItem('vibraze_visit_tracked')) {
+    if (!sessionStorage.getItem('sonify_visit_tracked')) {
         totalVisitors++;
-        localStorage.setItem('vibraze_visitor_count', totalVisitors);
-        sessionStorage.setItem('vibraze_visit_tracked', 'true');
+        localStorage.setItem('sonify_visitor_count', totalVisitors);
+        sessionStorage.setItem('sonify_visit_tracked', 'true');
     }
 }
 
 export function recordListen(statTotalListens) {
     totalListens++;
-    localStorage.setItem('vibraze_listen_count', totalListens);
+    localStorage.setItem('sonify_listen_count', totalListens);
     if (statTotalListens) statTotalListens.textContent = totalListens.toLocaleString();
 }
 
@@ -35,7 +35,7 @@ export async function recordLoginLog(username) {
     
     loginLogs.unshift(newLog);
     if (loginLogs.length > 50) loginLogs.pop();
-    localStorage.setItem('vibraze_login_logs', JSON.stringify(loginLogs));
+    localStorage.setItem('sonify_login_logs', JSON.stringify(loginLogs));
 }
 
 function getDeviceFromUA() {

@@ -18,7 +18,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Vibraze - Your Personal Music Experience",
+  title: "Sonify - Your Personal Music Experience",
   description: "A premium music experience built with Next.js",
 };
 

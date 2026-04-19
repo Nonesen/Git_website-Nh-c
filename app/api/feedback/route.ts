@@ -34,17 +34,17 @@ export async function POST(request: Request) {
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: 'khoakpham83@gmail.com',
-            subject: '🔔 Mới! Phản hồi từ người dùng Vibraze',
+            subject: '🔔 Mới! Phản hồi từ người dùng Sonify',
             html: `
                 <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                    <h2 style="color: #6366f1;">Vibraze Feedback</h2>
+                    <h2 style="color: #6366f1;">Sonify Feedback</h2>
                     <p><strong>Người gửi:</strong> ${email}</p>
                     <p><strong>Nội dung:</strong></p>
                     <div style="background: #f4f4f4; padding: 15px; border-radius: 5px;">
                         ${message}
                     </div>
                     <hr/>
-                    <p style="font-size: 0.8rem; color: #777;">Email này được gửi tự động từ hệ thống Vibraze.</p>
+                    <p style="font-size: 0.8rem; color: #777;">Email này được gửi tự động từ hệ thống Sonify.</p>
                 </div>
             `
         };

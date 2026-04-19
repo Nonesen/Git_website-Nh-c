@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        const savedSession = sessionStorage.getItem('vibraze_session');
+        const savedSession = sessionStorage.getItem('sonify_session');
         if (savedSession) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setUser(JSON.parse(savedSession));
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (data.success) {
                 const userData: User = data.user;
                 setUser(userData);
-                sessionStorage.setItem('vibraze_session', JSON.stringify(userData));
+                sessionStorage.setItem('sonify_session', JSON.stringify(userData));
                 return { success: true };
             }
             return { success: false, message: data.message || 'Sai tên đăng nhập hoặc mật khẩu!' };
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const logout = () => {
         setUser(null);
-        sessionStorage.removeItem('vibraze_session');
+        sessionStorage.removeItem('sonify_session');
     };
 
     return (

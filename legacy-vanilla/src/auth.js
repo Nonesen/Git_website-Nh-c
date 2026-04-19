@@ -2,7 +2,7 @@ import { recordLoginLog } from './stats.js';
 
 export let currentUser = null;
 export let currentRole = 'user';
-export let users = JSON.parse(localStorage.getItem('vibraze_users')) || [];
+export let users = JSON.parse(localStorage.getItem('sonify_users')) || [];
 
 export function setUsers(newUsers) {
     users = newUsers;
@@ -30,7 +30,7 @@ export function handleSignup(name, email, phone, user, pass) {
         role: 'user' 
     };
     users.push(newUser);
-    localStorage.setItem('vibraze_users', JSON.stringify(users));
+    localStorage.setItem('sonify_users', JSON.stringify(users));
     return { success: true };
 }
 

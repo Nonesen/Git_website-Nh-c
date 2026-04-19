@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
         <aside className="sidebar">
             <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
                 <i className="fa-solid fa-music"></i>
-                <span>Vibraze</span>
+                <span>Sonify</span>
             </div>
             
             <nav className="nav-menu">

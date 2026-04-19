@@ -1,6 +1,6 @@
-# Nhật Ký Thay Đổi & Phát Triển - Vibraze (18/04/2026)
+# Nhật Ký Thay Đổi & Phát Triển - Sonify (18/04/2026)
 
-Tài liệu này ghi nhận toàn bộ các chỉnh sửa và nâng cấp quan trọng đã được thực hiện cho dự án Web Nhạc Vibraze trong phiên làm việc hôm nay.
+Tài liệu này ghi nhận toàn bộ các chỉnh sửa và nâng cấp quan trọng đã được thực hiện cho dự án Web Nhạc Sonify trong phiên làm việc hôm nay.
 
 ## 1. Khắc Phục Lỗi Hệ Thống (Bug Fixes)
 - **Hệ thống Đăng nhập (Authentication)**:

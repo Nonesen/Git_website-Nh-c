@@ -77,7 +77,7 @@ export default function Home() {
 
   // Load recently played from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('vibraze_recent');
+    const saved = localStorage.getItem('sonify_recent');
     if (saved && allSongs.length > 0) {
       const recentIds = JSON.parse(saved);
       const filtered = recentIds.map((id: string | number) => allSongs.find(s => s.id === id)).filter(Boolean) as Song[];
