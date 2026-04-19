@@ -22,15 +22,14 @@
 | Tính năng | Mô tả |
 |---|---|
 | 🎵 **Music Player** | Phát nhạc đầy đủ tính năng: play/pause, skip, shuffle, repeat |
+| 🍔 **Collapsible Sidebar** | Sidebar có thể thu gọn (YouTube-style) để tối ưu không gian màn hình |
+| 💊 **Floating Pill Header** | Header dạng "thanh trôi" bo tròn hiện đại với hiệu ứng Glassmorphism |
 | 🌈 **Dynamic Background** | Nền web tự động đổi màu theo bìa album đang phát (như Apple Music) |
 | ❤️ **Persistent Favorites** | Lưu bài hát yêu thích bền vào localStorage |
-| 📋 **Queue Panel** | Xem hàng chờ bài hát, click để phát bất kỳ bài nào |
 | 🌐 **Đa ngôn ngữ** | Hỗ trợ Tiếng Việt & English |
-| 🌙 **Dark / Light Mode** | Chuyển đổi chủ đề sáng/tối mượt mà |
 | 👤 **Hệ thống tài khoản** | Đăng nhập bằng MongoDB thực tế, bảo mật |
-| 🔐 **Admin Panel** | Quản lý nhạc (thêm trực tiếp vào DB), quản lý người dùng |
-| 📊 **Lịch sử nghe** | Ghi nhớ bài đã nghe gần đây |
-| 📱 **Responsive** | Giao diện tương thích mọi màn hình |
+| 🔐 **Admin Panel** | Quản lý nhạc và người dùng trực quan |
+| 📱 **Responsive** | Giao diện tương thích 100% với Web và Mobile |
 
 ---
 
