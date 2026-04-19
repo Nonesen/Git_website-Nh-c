@@ -57,23 +57,25 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const { user, isAuthenticated } = useAuth();
     
+    // Reusable fetch function
+    const refreshSongs = useCallback(async () => {
+        try {
+            const response = await fetch('/api/songs');
+            const data = await response.json();
+            if (data.success) {
+                setAllSongs(data.data);
+                if (data.data.length > 0 && !currentSong) {
+                    setCurrentSong(data.data[0]);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch songs:', error);
+        }
+    }, [currentSong]);
+
     // Initial fetch of songs & local storage fallback
     useEffect(() => {
-        const fetchSongs = async () => {
-            try {
-                const response = await fetch('/api/songs');
-                const data = await response.json();
-                if (data.success) {
-                    setAllSongs(data.data);
-                    if (data.data.length > 0 && !currentSong) {
-                        setCurrentSong(data.data[0]);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to fetch songs:', error);
-            }
-        };
-        fetchSongs();
+        refreshSongs();
 
         // If not authenticated, load from local storage
         if (!isAuthenticated) {
@@ -336,18 +338,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     const addToNextUp = (song: Song) => {
         setQueue(prev => [song, ...prev]);
-    };
-
-    const refreshSongs = async () => {
-        try {
-            const response = await fetch('/api/songs');
-            const data = await response.json();
-            if (data.success) {
-                setAllSongs(data.data);
-            }
-        } catch (error) {
-            console.error('Failed to refresh songs:', error);
-        }
     };
 
     return (
