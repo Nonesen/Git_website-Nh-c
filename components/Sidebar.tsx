@@ -28,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
 
     return (
         <aside className="sidebar">
-            <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+            <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer', justifyContent: 'center' }}>
                 <i className="fa-solid fa-music"></i>
                 <span>Sonify</span>
             </div>
@@ -84,6 +84,30 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
                     </ul>
                 </div>
             )}
+
+            <div className="sidebar-footer" style={{ marginTop: 'auto', padding: '10px 0' }}>
+                <button 
+                    className="nav-menu li" 
+                    style={{ 
+                        width: '100%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '12px', 
+                        padding: '12px 20px', 
+                        borderRadius: '50px', 
+                        background: 'rgba(255,255,255,0.05)', 
+                        border: '1px solid var(--glass-border)',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        transition: 'all 0.2s'
+                    }}
+                    onClick={() => onTabChange('feedback')}
+                >
+                    <i className="fa-solid fa-circle-info"></i>
+                    <span>Trợ giúp & Góp ý</span>
+                </button>
+            </div>
         </aside>
     );
 };
