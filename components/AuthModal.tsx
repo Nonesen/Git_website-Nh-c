@@ -246,6 +246,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     </div>
                 )}
 
+                <div className="demo-creds">
+                    <span>Username: <strong>user</strong> | Password: <strong>123</strong></span>
+                </div>
             </div>
         </div>
     );

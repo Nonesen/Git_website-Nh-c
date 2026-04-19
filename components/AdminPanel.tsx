@@ -257,7 +257,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                                                 />
                                                 {!useExternalSource && (
                                                     <button 
-                                                        onClick={() => { setPickerType('img'); setPickerOpen(true); }}
+                                                        onClick={() => { 
+                                                            setPickerType('img'); setPickerOpen(true); 
+                                                            fetch(`/api/files?type=img&t=${Date.now()}`).then(r => r.json()).then(d => { if(d.success) setLocalImages(d.files); });
+                                                        }}
                                                         style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
                                                     >
                                                         <i className="fa-solid fa-magnifying-glass"></i> Chọn
@@ -279,7 +282,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ view }) => {
                                                 />
                                                 {!useExternalSource && (
                                                     <button 
-                                                        onClick={() => { setPickerType('sound'); setPickerOpen(true); }}
+                                                        onClick={() => { 
+                                                            setPickerType('sound'); setPickerOpen(true); 
+                                                            fetch(`/api/files?type=sound&t=${Date.now()}`).then(r => r.json()).then(d => { if(d.success) setLocalSounds(d.files); });
+                                                        }}
                                                         style={{ background: 'var(--primary-color)', color: 'white', border: 'none', padding: '0 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
                                                     >
                                                         <i className="fa-solid fa-music"></i> Chọn

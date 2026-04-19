@@ -28,6 +28,14 @@ export default function Home() {
   const [trendingSongs, setTrendingSongs] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isExploreLoading, setIsExploreLoading] = useState(false);
+  const [currentBanner, setCurrentBanner] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % 2);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Custom debounce function to avoid adding more deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,10 +140,40 @@ export default function Home() {
         />
 
         {activeTab === 'home' && !searchQuery.trim() && (
-          <section className="hero-section">
-            <div className="hero-content">
-              <h1>{t('hero-title')}</h1>
-              <p>{t('hero-subtitle')}</p>
+          <section 
+            className="hero-section" 
+            style={{ 
+              backgroundImage: currentBanner === 0 
+                ? 'url(/img/banner_boat.png)' 
+                : 'url(/img/banner_sunset.png)', 
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center',
+              transition: 'background-image 0.5s ease-in-out',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: currentBanner === 0 ? 'flex-start' : 'flex-end',
+              textAlign: currentBanner === 1 ? 'right' : 'left',
+              minHeight: '220px',
+              position: 'relative'
+            }}
+          >
+            <div className="hero-content" style={{ 
+               background: currentBanner === 0 ? 'rgba(0,30,60,0.5)' : 'rgba(80,30,10,0.4)', 
+               padding: '1.5rem 2rem', 
+               borderRadius: '16px',
+               backdropFilter: 'blur(3px)',
+               maxWidth: '60%',
+               border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <h1 style={{ 
+                  whiteSpace: 'pre-line', 
+                  fontSize: '2.2rem', 
+                  color: currentBanner === 0 ? '#e0f2fe' : '#ffedd5',
+                  textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                  marginBottom: '8px'
+              }}>
+                 {currentBanner === 0 ? "Gói Ghém\nBình Yên" : "Story hôm nay\nup bài gì?"}
+              </h1>
             </div>
           </section>
         )}
