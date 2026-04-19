@@ -1660,6 +1660,24 @@ h1, h2, h3, .logo span {
         border-radius: 14px;
     }
 
+    .hero-section.hero-banner {
+        min-height: 120px !important;
+        padding: 1rem !important;
+        border-radius: 14px !important;
+        margin-bottom: 1rem;
+    }
+
+    .hero-banner .hero-content {
+        max-width: 70% !important;
+        padding: 0.8rem 1rem !important;
+        border-radius: 10px !important;
+    }
+
+    .hero-banner .hero-content h1 {
+        font-size: 1.1rem !important;
+        margin-bottom: 2px !important;
+    }
+
     .hero-content h1 {
         font-size: 1.4rem;
     }
