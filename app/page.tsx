@@ -147,8 +147,8 @@ export default function Home() {
         {activeTab === 'home' && !searchQuery.trim() && (() => {
           const banners = [
             { 
-              img: '/img/banner_boat.png', 
-              text: "Gói ghém\nBình yên", 
+              img: '/img/banner_nature.png', 
+              text: "Gói ghém Bình yên", 
               color: '#e0f2fe', 
               bg: 'rgba(0,30,60,0.5)', 
               align: 'flex-start', 
@@ -156,7 +156,7 @@ export default function Home() {
             },
             { 
               img: '/img/banner_sunset.png', 
-              text: "Story hôm nay\nup bài gì?", 
+              text: "Story hôm nay up bài gì?", 
               color: '#ffedd5', 
               bg: 'rgba(80,30,10,0.4)', 
               align: 'flex-end', 
@@ -195,24 +195,24 @@ export default function Home() {
                 alignItems: 'center',
                 justifyContent: (banner as any).featured ? 'space-between' : banner.align as any,
                 textAlign: banner.textAlign as any,
-                minHeight: '180px',
+                minHeight: '220px',
                 position: 'relative',
-                padding: '1.5rem 2.5rem',
+                padding: '2rem 3rem',
                 gap: '2rem'
               }}
             >
               <div className="hero-content" style={{ 
                 background: banner.bg, 
-                padding: '1rem 1.5rem', 
+                padding: '1.2rem 2rem', 
                 borderRadius: '16px',
                 backdropFilter: 'blur(8px)',
-                maxWidth: (banner as any).featured ? '45%' : '55%',
+                maxWidth: (banner as any).featured ? '45%' : '85%',
                 border: '1px solid rgba(255,255,255,0.15)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
               }}>
                 <h1 style={{ 
-                    whiteSpace: 'pre-line', 
-                    fontSize: '1.6rem', 
+                    whiteSpace: (banner as any).featured ? 'pre-line' : 'nowrap', 
+                    fontSize: '1.8rem', 
                     color: banner.color,
                     textShadow: '0 2px 10px rgba(0,0,0,0.5)',
                     marginBottom: '4px',
