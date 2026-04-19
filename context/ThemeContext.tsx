@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'dark' | 'light' | 'system';
+type Theme = 'dark' | 'light' | 'system' | 'blue';
 
 interface ThemeContextType {
     theme: Theme;
@@ -12,28 +12,43 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [theme, setThemeState] = useState<Theme>('dark'); // Default to dark as per original design
+    const [theme, setThemeState] = useState<Theme>('dark'); 
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('sonify_theme') as Theme;
         if (savedTheme) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setThemeState(savedTheme);
-        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        } else {
             setThemeState('system');
         }
     }, []);
 
     useEffect(() => {
-        const root = window.document.documentElement;
-        let actualTheme = theme;
-        
+        const updateTheme = () => {
+            const root = window.document.documentElement;
+            let actualTheme = theme;
+            
+            if (theme === 'system') {
+                const hour = new Date().getHours();
+                // Day: 6 AM to 6 PM (18:00)
+                actualTheme = (hour >= 6 && hour < 18) ? 'light' : 'dark';
+            }
+
+            root.setAttribute('data-theme', actualTheme);
+            localStorage.setItem('sonify_theme', theme);
+        };
+
+        updateTheme();
+
+        // If in system mode, check every minute for time-based changes
+        let interval: NodeJS.Timeout;
         if (theme === 'system') {
-            actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            interval = setInterval(updateTheme, 60000);
         }
 
-        root.setAttribute('data-theme', actualTheme);
-        localStorage.setItem('sonify_theme', theme);
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, [theme]);
 
     const setTheme = (t: Theme) => {

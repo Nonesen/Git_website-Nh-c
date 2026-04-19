@@ -43,3 +43,5 @@ next-env.d.ts
 # local debug output
 eslint-output.txt
 lint.json
+
+.vercel
