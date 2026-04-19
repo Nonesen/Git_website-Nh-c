@@ -22,11 +22,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     const [newPassword, setNewPassword] = useState('');
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    // forgot-password: step 1 = nhập username, step 2 = nhập xác thực + mật khẩu mới
+    const [forgotStep, setForgotStep] = useState<1 | 2>(1);
+    const [userRole, setUserRole] = useState<'admin' | 'user' | null>(null);
+    const [isCheckingRole, setIsCheckingRole] = useState(false);
 
     const switchView = (newView: 'login' | 'signup' | 'forgot-password') => {
         setView(newView);
         setError('');
         setSuccessMsg('');
+        setForgotStep(1);
+        setUserRole(null);
+        setAuthKey('');
+        setNewPassword('');
     };
 
     if (!isOpen) return null;
@@ -62,6 +70,30 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             }
         } catch (err) {
             setError('Lỗi hệ thống');
+        }
+    };
+
+    const handleCheckRole = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setIsCheckingRole(true);
+        try {
+            const res = await fetch('/api/auth/check-role', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setUserRole(data.role);
+                setForgotStep(2);
+            } else {
+                setError(data.message || 'Không tìm thấy tài khoản này!');
+            }
+        } catch (err) {
+            setError('Lỗi hệ thống');
+        } finally {
+            setIsCheckingRole(false);
         }
     };
 
@@ -163,20 +195,49 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         </div>
                         {error && <p style={{ color: '#ef4444', marginBottom: '1rem', fontSize: '0.85rem' }}>{error}</p>}
                         {successMsg && <p style={{ color: '#22c55e', marginBottom: '1rem', fontSize: '0.85rem' }}>{successMsg}</p>}
-                        <form onSubmit={handleResetPassword}>
-                            <div className="form-group">
-                                <input type="text" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} required />
-                            </div>
-                            <div className="form-group">
-                                <input type="text" placeholder="Số điện thoại / Mật khẩu tạm (123)" value={authKey} onChange={(e) => setAuthKey(e.target.value)} required />
-                            </div>
-                            <div className="form-group password-group">
-                                <input type="password" placeholder="Mật khẩu mới" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-                                <i className="fa-regular fa-eye-slash toggle-password"></i>
-                            </div>
-                            <button type="submit" className="btn-auth-submit">Xác nhận đổi</button>
-                            <p className="auth-switch">Quay lại <span onClick={() => switchView('login')}>Đăng nhập</span></p>
-                        </form>
+
+                        {forgotStep === 1 ? (
+                            // Bước 1: Nhập tên đăng nhập để xác định loại tài khoản
+                            <form onSubmit={handleCheckRole}>
+                                <div className="form-group">
+                                    <input
+                                        type="text"
+                                        placeholder="Nhập tên đăng nhập của bạn"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <button type="submit" className="btn-auth-submit" disabled={isCheckingRole}>
+                                    {isCheckingRole ? 'Đang kiểm tra...' : 'Tiếp theo'}
+                                </button>
+                                <p className="auth-switch">Quay lại <span onClick={() => switchView('login')}>Đăng nhập</span></p>
+                            </form>
+                        ) : (
+                            // Bước 2: Hiện field xác thực tuỳ theo loại tài khoản
+                            <form onSubmit={handleResetPassword}>
+                                <div className="form-group">
+                                    <input type="text" value={username} readOnly style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+                                </div>
+                                <div className="form-group">
+                                    <input
+                                        type={userRole === 'admin' ? 'password' : 'text'}
+                                        placeholder={userRole === 'admin' ? 'Mật khẩu xác nhận của Admin' : 'Số điện thoại đã đăng ký'}
+                                        value={authKey}
+                                        onChange={(e) => setAuthKey(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group password-group">
+                                    <input type="password" placeholder="Mật khẩu mới" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                                    <i className="fa-regular fa-eye-slash toggle-password"></i>
+                                </div>
+                                <button type="submit" className="btn-auth-submit">Xác nhận đổi</button>
+                                <p className="auth-switch">
+                                    <span onClick={() => { setForgotStep(1); setError(''); setAuthKey(''); setNewPassword(''); }}>← Nhập lại tên đăng nhập</span>
+                                </p>
+                            </form>
+                        )}
                     </div>
                 )}
 
